@@ -79,9 +79,22 @@ function WindowManager(type)
 		{
 			//TODO <LOOK ON KNOWN SESSIONS FOR TYPE>
 		}
+		//Other messages
 		else
 		{
-			//TODO <ON MESSAGE>
+			var session = self.sessions[message.originUUID];
+
+			if(session !== undefined)
+			{
+				if(session.onMessage != null)
+				{
+					session.onMessage(message);
+				}
+			}
+			else
+			{
+				console.warn("TabTalk: Unknown session.")
+			}
 		}
 	});
 	this.manager.add(window, "beforeunload", function(event)
