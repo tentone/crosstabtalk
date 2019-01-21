@@ -209,11 +209,6 @@ WindowSession.prototype.acknowledge = function(onReady)
 
 	if(this.window !== null)
 	{
-		this.waitReady(function(event)
-		{
-			this
-		});
-
 		this.window.postMessage(message, "*");
 	}
 	else
