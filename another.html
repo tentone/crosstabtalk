@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<meta charset="utf-8">
+</head>
+<body>
+	<script type="text/javascript" src="source/EventManager.js"></script>
+	<script type="text/javascript" src="source/WindowManager.js"></script>
+	<script type="text/javascript" src="source/WindowMessage.js"></script>
+	<script type="text/javascript" src="source/WindowSession.js"></script>
+	<script type="text/javascript">
+		var text = document.createElement("div");
+		text.innerHTML = "Window B";
+		document.body.append(text);
+
+		var manager = new WindowManager("body");
+	</script>
+</body>
+</html>
