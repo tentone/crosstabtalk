@@ -53,30 +53,31 @@ function WindowManager(type)
 	{
 		var message = event.data;
 
-		console.log("Window message received.", event);
+		console.log("TabTalk: WindowManager, Message received.", event);
 
-		//Session ready
-		if(message.action === "ready")
-		{
-			var origin = event.origin;
-
-			var session = self.sessions[message.originUUID];
-			if(session !== undefined)
-			{
-				
-			}
-		}
 		//Session closed
-		else if(message.action === "closed")
+		if(message.action === "closed")
 		{
 			var session = self.sessions[message.originUUID];
 
-			//TODO <CLOSED EVENT>
-
 			if(session !== undefined)
 			{
+				if(session.onClose != null)
+				{
+					session.onClose();
+				}
+
 				delete self.sessions[message.originUUID];
 			}
+			else
+			{
+				console.warn("TabTalk: Unknown session.")
+			}
+		}
+		//Lookup
+		if(message.action === "lookup")
+		{
+			//TODO <LOOK ON KNOWN SESSIONS FOR TYPE>
 		}
 		else
 		{
@@ -109,11 +110,8 @@ WindowManager.prototype.checkOpener = function()
 	{
 		var session = new WindowSession(this);
 		session.window = window.opener;
-		session.status = WindowSession.READY;
 		session.acknowledge();
-
-		//TODO <ADD SESSION TO THE LIST>
-
+		session.waitReady();
 		return session;
 	}
 
@@ -138,15 +136,13 @@ WindowManager.prototype.openSession = function(url, type)
 	session.window = window.open(url);
 	session.url = url;
 	session.type = type;
-	session.waitReady(function(event)
-	{
-		var message = event.data;
-
-		//TODO <FILL DATA>
-	});
-	//TODO <ADD SESSION TO THE LIST>
-
+	session.waitReady();
 	return session;
+};
+
+WindowManager.prototype.lookup = function(type, onFinish)
+{
+	//TODO <ADD CODE HERE>
 };
 
 /**
@@ -178,7 +174,9 @@ WindowManager.prototype.dispose = function()
 };
 
 /**
- * Generate a UUID V4.
+ * Generate a UUID used to indetify the window manager.
+ *
+ * .toUpperCase() here flattens concatenated strings to save heap memory space.
  *
  * http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
  *
@@ -204,7 +202,6 @@ WindowManager.generateUUID = function()
 			lut[ d2 & 0x3f | 0x80 ] + lut[ d2 >> 8 & 0xff ] + '-' + lut[ d2 >> 16 & 0xff ] + lut[ d2 >> 24 & 0xff ] +
 			lut[ d3 & 0xff ] + lut[ d3 >> 8 & 0xff ] + lut[ d3 >> 16 & 0xff ] + lut[ d3 >> 24 & 0xff ];
 
-		// .toUpperCase() here flattens concatenated strings to save heap memory space.
 		return uuid.toUpperCase();
 	};
 }();

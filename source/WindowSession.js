@@ -148,6 +148,48 @@ WindowSession.READY = 102;
 WindowSession.CLOSED = 103;
 
 /**
+ * Set the state of the window.
+ *
+ * Ensures the correct order of the state being set.
+ *
+ * @method setState
+ * @param {Number} state
+ */
+WindowSession.prototype.setState = function(state)
+{
+	if(state <= this.state)
+	{
+		console.log("TabTalk: Invalid state, cannot go from " + this.state + " to " + state + ".");
+		return;
+	}
+
+	this.state = state;
+
+	//Send all queued waiting message
+	if(this.status === WindowSession.READY)
+	{
+		for(var i = 0; i < this.queue; i++)
+		{
+			if(this.window !== null)
+			{
+				this.window.postMessage(this.queue[i], "*");
+			}
+			else if(this.gateway !== null)
+			{
+				this.gateway.postMessage(this.queue[i], "*");
+			}
+			else
+			{
+				console.warn("TabTalk: Session has no window attached.");
+				return;
+			}
+		}
+
+		this.queue = [];
+	}
+};
+
+/**
  * Post data to another window, windows references are stored using their url for later usage.
  *
  * If the window is unknonwn the opener window is used if available.
@@ -164,7 +206,7 @@ WindowSession.prototype.sendMessage = function(action, data, token)
 	if(this.status === WindowSession.WAITING)
 	{
 		this.queue.push(message);
-		console.warn("Still on waiting status message was queued.");
+		console.log("TabTalk: Still on waiting status message was queued.", message);
 	}
 	else
 	{
@@ -178,8 +220,11 @@ WindowSession.prototype.sendMessage = function(action, data, token)
 		}
 		else
 		{
-			console.warn("Session has no window attached.");
+			console.warn("TabTalk: Session has no window attached.");
+			return;
 		}
+
+		console.log("TabTalk: Message sent.", message);
 	}
 };
 
@@ -213,7 +258,7 @@ WindowSession.prototype.acknowledge = function(onReady)
 	}
 	else
 	{
-		console.warn("Session has no window attached.");
+		console.warn("TabTalk: Session has no window attached.");
 	}
 };
 
@@ -225,27 +270,41 @@ WindowSession.prototype.acknowledge = function(onReady)
  * @method waitReady
  * @param {Function} onReady Callback called when the winow is ready.
  */
-WindowSession.prototype.waitReady = function(onReady)
-{	
+WindowSession.prototype.waitReady = function()
+{
+	var self = this;
+
 	var manager = new EventManager();
 	manager.add(window, "message", function(event)
 	{
+		if(event.source !== self.window)
+		{
+			return;
+		}
+
 		var data = event.data;
 
 		if(data.action === "ready")
 		{
-			console.log("Received ready message.", data, event);
+			console.log("TabTalk: Received ready message.", data, event);
 
-			if(onReady !== undefined)
+			self.type = data.originType;
+			self.uuid = data.originUUID;
+			self.manager.sessions[self.uuid] = self;
+			self.setState(WindowSession.READY);
+
+			if(self.onReady !== null)
 			{
-				onReady(event);
+				self.onReady(event);
 			}
 
 			manager.destroy();
+
+			self.acknowledge();
 		}
 		else
 		{
-			console.log("Not a ready message, waiting for ready.", data, event);
+			console.warn("TabTalk: Not a ready message, waiting for ready.", data, event);
 		}
 
 	});
