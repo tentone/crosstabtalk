@@ -21,24 +21,33 @@
 		};
 		
 		var session = manager.openSession("another.html", "B");
+		var sessionIndirect;
+
 		session.onReady = function()
 		{
-			session.sendMessage("Test message 123");
+			console.log("Session B is ready.");
+			session.sendMessage("Test message from A to B");
+
+			
 		};
 		session.onMessage = function(data, authentication)
 		{
-			console.log("Message received", data, authentication);
+			console.log("Session B message received", data, authentication);
 		};
 		session.onClose = function()
 		{
-			console.log("Session closed");
+			console.log("Session B closed");
 		};
 
-		/*var sessionIndirect = manager.openSession(null, "C");
-		sessionIndirect.onReady = function()
+		function openC()
 		{
-			
-		};*/
+			sessionIndirect = manager.openSession("yetanother.html", "C");
+			sessionIndirect.onReady = function()
+			{
+				console.log("Session C is ready.");
+			};
+		}
+
 	</script>
 </body>
 </html>

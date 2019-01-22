@@ -43,6 +43,16 @@ function WindowManager(type)
 	this.sessions = {};
 
 	/**
+	 * List of sessions in waiting state.
+	 *
+	 * These still havent reached the READY state.
+	 *
+	 * @attribute waitingSessions
+	 * @type {Array}
+	 */
+	this.waitingSessions = [];
+
+	/**
 	 * On broadcast message callback, receives data and authentication as parameters.
 	 *
 	 * Called when a broadcast message arrives, onBroadcastMessage(data, authentication).
@@ -66,6 +76,17 @@ function WindowManager(type)
 		if(message.destinationUUID !== undefined && message.destinationUUID !== self.uuid)
 		{
 			console.warn("TabTalk: Destination UUID diferent from self.", message.destinationUUID);
+
+			var session = self.sessions[message.destinationUUID];
+			if(session !== undefined)
+			{
+				session.send(message);
+				console.log("TabTalk: Redirect message to destination.", message);
+			}
+			else
+			{
+				console.warn("TabTalk: Unknown destination, cannot redirect message.");
+			}
 		}
 
 		//Session closed
@@ -84,18 +105,76 @@ function WindowManager(type)
 			}
 			else
 			{
-				console.warn("TabTalk: Unknown origin session.")
+				console.warn("TabTalk: Unknown closed origin session.")
 			}
+		}
+		//Lookup
+		else if(message.action === WindowMessage.LOOKUP)
+		{
+			console.log("TabTalk: WindowManager lookup request received from " + message.originType + ".", message);
+
+			var found = false;
+			var response;
+
+			for(var i in self.sessions)
+			{
+				var session = self.sessions[i];
+
+				if(session.type === message.destinationType)
+				{
+					var response = new WindowMessage(0, WindowMessage.LOOKUP_FOUND, self.type, self.uuid, undefined, undefined,
+					{
+						uuid:session.uuid,
+						type:session.type
+					});
+					found = true;
+					break;
+				}
+				else
+				{
+					//TODO <BROADCAST LOOKUP MESSAGE>
+				}
+			}
+
+			if(found === false)
+			{
+				response = new WindowMessage(0, WindowMessage.LOOKUP_NOT_FOUND, self.type, self.uuid);
+			}
+
+			var session = self.sessions[message.originUUID];
+			if(session !== undefined)
+			{
+				session.send(response);
+				console.log("TabTalk: Response to lookup request sent.", response);
+			}
+			else
+			{
+				console.warn("TabTalk: Unknown lookup origin session.");
+			}
+		}
+		//Connect message
+		else if(message.action === WindowMessage.CONNECT)
+		{
+			var session = new WindowSession(self);
+			session.uuid = message.originUUID;
+			session.type = message.originType;
+			session.acknowledge();
+			session.waitReady();
+
+			console.warn("TabTalk: Connect message received, creating a new session.", message, session);
 		}
 		//Broadcast
 		else if(message.action === WindowMessage.BROADCAST)
 		{
+			console.log("TabTalk: WindowManager broadcast message received " + message.originType + ".", message);
+
 			if(self.onBroadcastMessage !== null)
 			{
 				self.onBroadcastMessage(message.data, message.authentication);
 			}
 
 			//TODO <FIX BROADCAST LOOP>
+
 			for(var i in self.sessions)
 			{
 				var session = self.sessions[i];
@@ -111,15 +190,10 @@ function WindowManager(type)
 				}
 			}
 		}
-		//Lookup
-		else if(message.action === WindowMessage.LOOKUP)
-		{
-			//TODO <LOOK ON KNOWN SESSIONS FOR TYPE>
-		}
 		//Messages
 		else if(message.action === WindowMessage.MESSAGE)
 		{
-			console.log("TabTalk: WindowManager, Message received.", message);
+			console.log("TabTalk: WindowManager message received " + message.originType + ".", message);
 
 			var session = self.sessions[message.originUUID];
 			if(session !== undefined)
@@ -131,7 +205,7 @@ function WindowManager(type)
 			}
 			else
 			{
-				console.warn("TabTalk: Unknown origin session.")
+				console.warn("TabTalk: Unknown origin session.");
 			}
 		}
 	});
@@ -202,27 +276,34 @@ WindowManager.prototype.checkOpener = function()
  */
 WindowManager.prototype.openSession = function(url, type)
 {
+	var session = new WindowSession(this);
+	session.type = type;
+
 	//Lookup the session
 	if(type !== undefined)
 	{
 		this.lookup(type, function(gateway)
 		{
+			//Not found
 			if(gateway === null)
 			{
-				//TODO <OPEN NEW WINDOW>
+				if(url !== null)
+				{				
+					session.url = url;
+					session.window = window.open(url);
+					session.waitReady();
+				}
 			}
+			//Found
 			else
 			{
-				//TODO <ADD CODE HERE>
+				session.gateway = gateway;
+				session.connect();
+				session.waitReady();
 			}
 		});
 	}
 
-	var session = new WindowSession(this);
-	session.window = window.open(url);
-	session.url = url;
-	session.type = type;
-	session.waitReady();
 	return session;
 };
 
@@ -235,51 +316,61 @@ WindowManager.prototype.openSession = function(url, type)
  */
 WindowManager.prototype.lookup = function(type, onFinish)
 {
-	var message = new WindowMessage(0, WindowMessage.LOOKUP, this.manager.type, this.manager.uuid, type, undefined);
+	var message = new WindowMessage(0, WindowMessage.LOOKUP, this.type, this.uuid, type, undefined);
 	var sent = 0, received = 0, found = false;
 
 	for(var i in this.sessions)
 	{
-		sent++;
+		console.log("TabTalk: Send lookup message to " + i + ".", message);
 		this.sessions[i].send(message);
+		sent++;
 	}
 
-	var self = this;
-
-	var manager = new EventManager();
-	manager.add(window, "message", function(event)
+	if(sent > 0)
 	{
-		var data = event.data;
-		if(data.action === WindowMessage.LOOKUP_FOUND)
+		var self = this;
+		var manager = new EventManager();
+		manager.add(window, "message", function(event)
 		{
-			if(found === false)
+			var data = event.data;
+			if(data.action === WindowMessage.LOOKUP_FOUND)
 			{
-				var session = self.sessions[data.originUUID];
-				if(session !== undefined)
+				if(found === false)
 				{
-					found = true;
-					onFinish(session);
+					var session = self.sessions[data.originUUID];
+					if(session !== undefined)
+					{
+						found = true;
+						onFinish(session);
+					}
+				}
+				
+				console.log("TabTalk: Received lookup FOUND message from " + data.originUUID + ".");
+				received++;
+			}
+			else if(data.action === WindowMessage.LOOKUP_NOT_FOUND)
+			{
+				console.log("TabTalk: Received lookup NOT FOUND message from " + data.originUUID + ".");
+				received++;
+			}
+
+			if(sent === received)
+			{
+				manager.destroy();
+
+				if(found === false)
+				{
+					onFinish(null);
 				}
 			}
-		
-			received++;
-		}
-		else if(data.action === WindowMessage.LOOKUP_NOT_FOUND)
-		{
-			received++;
-		}
-
-		if(sent === received)
-		{
-			manager.destroy();
-
-			if(found === false)
-			{
-				onFinish(null);
-			}
-		}
-	});
-	manager.create();
+		});
+		manager.create();
+	}
+	else
+	{
+		console.log("TabTalk: No session available to run lookup.");
+		onFinish(null);
+	}
 };
 
 /**
@@ -325,7 +416,7 @@ WindowManager.generateUUID = function()
 	var lut = [];
 	for(var i = 0; i < 256; i ++)
 	{
-		lut[i] = (i < 16 ? '0' : '') + (i).toString(16);
+		lut[i] = (i < 16 ? "0" : "") + (i).toString(16);
 	}
 
 	return function generateUUID()
@@ -334,9 +425,9 @@ WindowManager.generateUUID = function()
 		var d1 = Math.random() * 0xffffffff | 0;
 		var d2 = Math.random() * 0xffffffff | 0;
 		var d3 = Math.random() * 0xffffffff | 0;
-		var uuid = lut[ d0 & 0xff ] + lut[ d0 >> 8 & 0xff ] + lut[ d0 >> 16 & 0xff ] + lut[ d0 >> 24 & 0xff ] + '-' +
-			lut[ d1 & 0xff ] + lut[ d1 >> 8 & 0xff ] + '-' + lut[ d1 >> 16 & 0x0f | 0x40 ] + lut[ d1 >> 24 & 0xff ] + '-' +
-			lut[ d2 & 0x3f | 0x80 ] + lut[ d2 >> 8 & 0xff ] + '-' + lut[ d2 >> 16 & 0xff ] + lut[ d2 >> 24 & 0xff ] +
+		var uuid = lut[ d0 & 0xff ] + lut[ d0 >> 8 & 0xff ] + lut[ d0 >> 16 & 0xff ] + lut[ d0 >> 24 & 0xff ] + "-" +
+			lut[ d1 & 0xff ] + lut[ d1 >> 8 & 0xff ] + "-" + lut[ d1 >> 16 & 0x0f | 0x40 ] + lut[ d1 >> 24 & 0xff ] + "-" +
+			lut[ d2 & 0x3f | 0x80 ] + lut[ d2 >> 8 & 0xff ] + "-" + lut[ d2 >> 16 & 0xff ] + lut[ d2 >> 24 & 0xff ] +
 			lut[ d3 & 0xff ] + lut[ d3 >> 8 & 0xff ] + lut[ d3 >> 16 & 0xff ] + lut[ d3 >> 24 & 0xff ];
 
 		return uuid.toUpperCase();

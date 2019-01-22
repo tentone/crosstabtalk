@@ -176,6 +176,7 @@ WindowMessage.MESSAGE = 3;
  *		type: BROADCAST,
  *		originUUID: ...,
  *		originType: ...,
+ *		destinationUUID: "*",
  *		data(?): ...,
  *		authentication(?): ...,
  * }
@@ -195,7 +196,8 @@ WindowMessage.BROADCAST = 4;
  *		originType: ...,
  *		data:
  *		{
- *			...
+ *			uuid: ..., //Of the requested session
+ *			type: ... 
  *		}
  * }
  *
@@ -219,3 +221,22 @@ WindowMessage.LOOKUP_FOUND = 5;
  * @type {Number}
  */
 WindowMessage.LOOKUP_NOT_FOUND = 6;
+
+/**
+ * Message used after obtaining a positive lookup respose to connect to the remote window trough the middle layers.
+ *
+ * After the connect message reaches the destination the window should send a READY message.
+ *
+ * {
+ *		type: CONNECT,
+ *		originUUID: ...,
+ *		originType: ...,
+ *		destinationType: ...,
+ *		destinationUUID: ...,
+ * }
+ *
+ * @static
+ * @attribute CONNECT
+ * @type {Number}
+ */
+WindowMessage.CONNECT = 7;

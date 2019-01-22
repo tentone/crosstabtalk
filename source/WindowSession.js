@@ -94,6 +94,14 @@ function WindowSession(manager)
 	this.queue = [];
 
 	/**
+	 * Domains allowed for this session messages.
+	 *
+	 * @attribute allowdomain
+	 * @type {String}
+	 */
+	this.allowdomain = "*";
+
+	/**
 	 * On message callback, receives data and authentication as parameters.
 	 *
 	 * Called when a normal message is received from another window, onMessage(data, authentication).
@@ -171,7 +179,7 @@ WindowSession.prototype.setStatus = function(status)
 {
 	if(status <= this.status)
 	{
-		console.log("TabTalk: Invalid status, cannot go from " + this.status + " to " + status + ".");
+		console.warn("TabTalk: Invalid status cannot go from " + this.status + " to " + status + ".");
 		return;
 	}
 
@@ -203,11 +211,11 @@ WindowSession.prototype.send = function(message)
 {
 	if(this.window !== null)
 	{
-		this.window.postMessage(message, "*");
+		this.window.postMessage(message, this.allowdomain);
 	}
 	else if(this.gateway !== null)
 	{
-		this.gateway.postMessage(message, "*");
+		this.gateway.send(message);
 	}
 	else
 	{
@@ -244,27 +252,42 @@ WindowSession.prototype.sendMessage = function(data, authentication)
  * Close this session, send a close message and is possible close the window.
  * 
  * @method close
+ * @param {Boolean} closeWindow If set true the session window will be closed (if possible).
  */
-WindowSession.prototype.close = function()
+WindowSession.prototype.close = function(closeWindow)
 {
 	var message = new WindowMessage(this.counter++, WindowMessage.CLOSED, this.manager.type, this.manager.uuid, this.type, this.uuid);
 
 	this.sendMessage(message);
 	
-	if(this.window !== null)
+	if(closeWindow === true && this.window !== null)
 	{
 		this.window.close();
 	}
 };
 
 /**
- * Send a message to indicate that this session is ready to be used.
+ * Send a message to indicate that this session is READY.
+ *
+ * Also sends the session metadata for the remote window.
  *
  * @method acknowledge
  */
-WindowSession.prototype.acknowledge = function(onReady)
+WindowSession.prototype.acknowledge = function()
 {
 	this.send(new WindowMessage(this.counter++, WindowMessage.READY, this.manager.type, this.manager.uuid));
+};
+
+/**
+ * Used to indicate the connection intent to remote windows after a positive lookup response.
+ *
+ * Works similarly to the ready message.
+ *
+ * @method connect
+ */
+WindowSession.prototype.connect = function()
+{
+	this.send(new WindowMessage(this.counter++, WindowMessage.CONNECT, this.manager.type, this.manager.uuid));
 };
 
 /**

@@ -15,11 +15,10 @@
 		document.body.append(text);
 
 		var manager = new WindowManager("B");
-
 		var session = manager.openSession("yetanother.html", "C");
 		session.onReady = function()
 		{
-			session.sendMessage("Mensagem de teste 123");
+			session.sendMessage("Test message from B to C");
 		};
 	</script>
 </body>
