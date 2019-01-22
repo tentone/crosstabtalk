@@ -107,6 +107,12 @@ function WindowMessage(number, action, originType, originUUID, destinationType, 
 /**
  * Ready message exchanged before starting comunication.
  *
+ * {
+ *		type: READY,
+ *		originUUID: ...,
+ *		originType: ...
+ * }
+ *
  * @static
  * @attribute READY
  * @type {Number}
@@ -116,6 +122,12 @@ WindowMessage.READY = 0;
 /**
  * Closed message is used to indicate that the comunication was terminated.
  *
+ * {
+ *		type: CLOSED,
+ *		originUUID: ...,
+ *		originType: ...
+ * }
+ *
  * @static
  * @attribute CLOSED
  * @type {Number}
@@ -123,7 +135,14 @@ WindowMessage.READY = 0;
 WindowMessage.CLOSED = 1;
 
 /**
- * Message to search for a window type.
+ * Message to lookup for a window type in the neighbor session.
+ *
+ * {
+ *		type: LOOKUP,
+ *		originUUID: ...,
+ *		originType: ...,
+ *		destinationType: ...
+ * }
  *
  * @static
  * @attribute LOOKUP
@@ -134,8 +153,69 @@ WindowMessage.LOOKUP = 2;
 /**
  * Regular message exchanged between the windows.
  *
+ * {
+ *		type: LOOKUP,
+ *		originUUID: ...,
+ *		originType: ...,
+ *		destinationType: ...,
+ *		destinationUUID: ...,
+ *		data(?): ...,
+ *		authentication(?): ...,
+ * }
+ *
  * @static
  * @attribute MESSAGE
  * @type {Number}
  */
 WindowMessage.MESSAGE = 3;
+
+/**
+ * Broadcast message.
+ *
+ * {
+ *		type: BROADCAST,
+ *		originUUID: ...,
+ *		originType: ...,
+ *		data(?): ...,
+ *		authentication(?): ...,
+ * }
+ *
+ * @static
+ * @attribute BROADCAST
+ * @type {Number}
+ */
+WindowMessage.BROADCAST = 4;
+
+/**
+ * Lookup response for when a window was found.
+ *
+ * {
+ *		type: LOOKUP_FOUND,
+ *		originUUID: ...,
+ *		originType: ...,
+ *		data:
+ *		{
+ *			...
+ *		}
+ * }
+ *
+ * @static
+ * @attribute LOOKUP_FOUND
+ * @type {Number}
+ */
+WindowMessage.LOOKUP_FOUND = 5;
+
+/**
+ * Message responde for when a window is not found.
+ *
+ * {
+ *		type: LOOKUP_NOT_FOUND,
+ *		originUUID: ...,
+ *		originType: ...
+ * }
+ *
+ * @static
+ * @attribute LOOKUP_NOT_FOUND
+ * @type {Number}
+ */
+WindowMessage.LOOKUP_NOT_FOUND = 6;

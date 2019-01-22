@@ -15,6 +15,10 @@
 		document.body.append(text);
 
 		var manager = new WindowManager("A");
+		manager.onBroadcastMessage = function(data, authentication)
+		{
+			console.log("Broadcast Message received", data, authentication);
+		};
 		
 		var session = manager.openSession("another.html", "B");
 		session.onReady = function()
@@ -29,7 +33,6 @@
 		{
 			console.log("Session closed");
 		};
-		
 
 		/*var sessionIndirect = manager.openSession(null, "C");
 		sessionIndirect.onReady = function()

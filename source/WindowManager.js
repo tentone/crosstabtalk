@@ -43,6 +43,16 @@ function WindowManager(type)
 	this.sessions = {};
 
 	/**
+	 * On broadcast message callback, receives data and authentication as parameters.
+	 *
+	 * Called when a broadcast message arrives, onBroadcastMessage(data, authentication).
+	 *
+	 * @attribute onBroadcastMessage
+	 * @type {Function}
+	 */
+	this.onBroadcastMessage = null;
+
+	/**
 	 * Event manager containing the message handling events for this manager.
 	 *
 	 * @attribute manager
@@ -53,7 +63,7 @@ function WindowManager(type)
 	{
 		var message = event.data;
 
-		if(message.destinationUUID !== self.uuid)
+		if(message.destinationUUID !== undefined && message.destinationUUID !== self.uuid)
 		{
 			console.warn("TabTalk: Destination UUID diferent from self.", message.destinationUUID);
 		}
@@ -77,8 +87,32 @@ function WindowManager(type)
 				console.warn("TabTalk: Unknown origin session.")
 			}
 		}
+		//Broadcast
+		else if(message.action === WindowMessage.BROADCAST)
+		{
+			if(self.onBroadcastMessage !== null)
+			{
+				self.onBroadcastMessage(message.data, message.authentication);
+			}
+
+			//TODO <FIX BROADCAST LOOP>
+			for(var i in self.sessions)
+			{
+				var session = self.sessions[i];
+
+				if(session.uuid !== message.originUUID)
+				{
+					session.send(message);
+
+					if(session.onBroadcastMessage !== null)
+					{
+						session.onBroadcastMessage(message.data, message.authentication);
+					}
+				}
+			}
+		}
 		//Lookup
-		if(message.action === WindowMessage.LOOKUP)
+		else if(message.action === WindowMessage.LOOKUP)
 		{
 			//TODO <LOOK ON KNOWN SESSIONS FOR TYPE>
 		}
@@ -90,7 +124,7 @@ function WindowManager(type)
 			var session = self.sessions[message.originUUID];
 			if(session !== undefined)
 			{
-				if(session.onMessage != null)
+				if(session.onMessage !== null)
 				{
 					session.onMessage(message.data, message.authentication);
 				}
@@ -114,6 +148,25 @@ function WindowManager(type)
 
 	this.checkOpener();
 }
+
+/**
+ * Broadcast a message to all available sessions.
+ *
+ * The message will be passed further on.
+ *
+ * @method broadcast
+ * @param {WindowMessage} data Data to be broadcasted.
+ * @param {String} authentication Authentication information.
+ */
+WindowManager.prototype.broadcast = function(data, authentication)
+{
+	var message = new WindowMessage(0, WindowMessage.BROADCAST, this.manager.type, this.manager.uuid, undefined, undefined, data, authentication);
+
+	for(var i in this.sessions)
+	{
+		this.sessions[i].send(message);
+	}
+};
 
 /**
  * Send an acknowledge message.
@@ -152,8 +205,17 @@ WindowManager.prototype.openSession = function(url, type)
 	//Lookup the session
 	if(type !== undefined)
 	{
-		this.lookup(type);
-		//TODO <ADD CODE HERE>
+		this.lookup(type, function(gateway)
+		{
+			if(gateway === null)
+			{
+				//TODO <OPEN NEW WINDOW>
+			}
+			else
+			{
+				//TODO <ADD CODE HERE>
+			}
+		});
 	}
 
 	var session = new WindowSession(this);
@@ -169,10 +231,55 @@ WindowManager.prototype.openSession = function(url, type)
  *
  * @method lookup
  * @param {String} type Type of the window to look for.
+ * @param {String} onFinish Receives the gateway session as parameter, if null no window of the type was found.
  */
 WindowManager.prototype.lookup = function(type, onFinish)
 {
-	//TODO <ADD CODE HERE>
+	var message = new WindowMessage(0, WindowMessage.LOOKUP, this.manager.type, this.manager.uuid, type, undefined);
+	var sent = 0, received = 0, found = false;
+
+	for(var i in this.sessions)
+	{
+		sent++;
+		this.sessions[i].send(message);
+	}
+
+	var self = this;
+
+	var manager = new EventManager();
+	manager.add(window, "message", function(event)
+	{
+		var data = event.data;
+		if(data.action === WindowMessage.LOOKUP_FOUND)
+		{
+			if(found === false)
+			{
+				var session = self.sessions[data.originUUID];
+				if(session !== undefined)
+				{
+					found = true;
+					onFinish(session);
+				}
+			}
+		
+			received++;
+		}
+		else if(data.action === WindowMessage.LOOKUP_NOT_FOUND)
+		{
+			received++;
+		}
+
+		if(sent === received)
+		{
+			manager.destroy();
+
+			if(found === false)
+			{
+				onFinish(null);
+			}
+		}
+	});
+	manager.create();
 };
 
 /**

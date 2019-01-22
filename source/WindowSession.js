@@ -94,12 +94,24 @@ function WindowSession(manager)
 	this.queue = [];
 
 	/**
-	 * On message callback.
+	 * On message callback, receives data and authentication as parameters.
+	 *
+	 * Called when a normal message is received from another window, onMessage(data, authentication).
 	 *
 	 * @attribute onMessage
 	 * @type {Function}
 	 */
 	this.onMessage = null;
+
+	/**
+	 * On broadcast message callback, receives data and authentication as parameters.
+	 *
+	 * Called when a broadcast message arrives, onBroadcastMessage(data, authentication).
+	 *
+	 * @attribute onBroadcastMessage
+	 * @type {Function}
+	 */
+	this.onBroadcastMessage = null;
 
 	/**
 	 * On closed callback.

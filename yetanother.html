@@ -15,6 +15,10 @@
 		document.body.append(text);
 
 		var manager = new WindowManager("C");
+		manager.onBroadcastMessage = function(data, authentication)
+		{
+			console.log("Broadcast Message received", data, authentication);
+		};
 	</script>
 </body>
 </html>
