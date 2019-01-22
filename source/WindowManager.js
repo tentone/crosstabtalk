@@ -53,10 +53,13 @@ function WindowManager(type)
 	{
 		var message = event.data;
 
-		console.log("TabTalk: WindowManager, Message received.", event);
+		if(message.destinationUUID !== self.uuid)
+		{
+			console.warn("TabTalk: Destination UUID diferent from self.", message.destinationUUID);
+		}
 
 		//Session closed
-		if(message.action === "closed")
+		if(message.action === WindowMessage.CLOSED)
 		{
 			var session = self.sessions[message.originUUID];
 
@@ -71,32 +74,34 @@ function WindowManager(type)
 			}
 			else
 			{
-				console.warn("TabTalk: Unknown session.")
+				console.warn("TabTalk: Unknown origin session.")
 			}
 		}
 		//Lookup
-		if(message.action === "lookup")
+		if(message.action === WindowMessage.LOOKUP)
 		{
 			//TODO <LOOK ON KNOWN SESSIONS FOR TYPE>
 		}
-		//Other messages
-		else
+		//Messages
+		else if(message.action === WindowMessage.MESSAGE)
 		{
-			var session = self.sessions[message.originUUID];
+			console.log("TabTalk: WindowManager, Message received.", message);
 
+			var session = self.sessions[message.originUUID];
 			if(session !== undefined)
 			{
 				if(session.onMessage != null)
 				{
-					session.onMessage(message);
+					session.onMessage(message.data, message.authentication);
 				}
 			}
 			else
 			{
-				console.warn("TabTalk: Unknown session.")
+				console.warn("TabTalk: Unknown origin session.")
 			}
 		}
 	});
+
 	this.manager.add(window, "beforeunload", function(event)
 	{
 		for(var i in self.sessions)
@@ -104,6 +109,7 @@ function WindowManager(type)
 			self.sessions[i].close();
 		}
 	});
+
 	this.manager.create();
 
 	this.checkOpener();
@@ -138,13 +144,18 @@ WindowManager.prototype.checkOpener = function()
  *
  * @method openSession
  * @param {String} url URL of the window.
- * @param {String} type Type of the window to open.
+ * @param {String} type Type of the window to open (Optional).
  * @return {WindowSession} Session createed to open a new window.
  */
 WindowManager.prototype.openSession = function(url, type)
 {
-	//TODO <LOOKUP FOR A SESSION OF THIS TYPE>
-	
+	//Lookup the session
+	if(type !== undefined)
+	{
+		this.lookup(type);
+		//TODO <ADD CODE HERE>
+	}
+
 	var session = new WindowSession(this);
 	session.window = window.open(url);
 	session.url = url;
@@ -153,6 +164,12 @@ WindowManager.prototype.openSession = function(url, type)
 	return session;
 };
 
+/**
+ * Lookup for a window type.
+ *
+ * @method lookup
+ * @param {String} type Type of the window to look for.
+ */
 WindowManager.prototype.lookup = function(type, onFinish)
 {
 	//TODO <ADD CODE HERE>

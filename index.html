@@ -15,10 +15,27 @@
 		document.body.append(text);
 
 		var manager = new WindowManager("A");
-		var session = manager.openSession("another.html", "B");
 		
-		//session.sendMessage("message", {a:1, b:2, c:3}, "asdadas");
+		var session = manager.openSession("another.html", "B");
+		session.onReady = function()
+		{
+			session.sendMessage("Test message 123");
+		};
+		session.onMessage = function(data, authentication)
+		{
+			console.log("Message received", data, authentication);
+		};
+		session.onClose = function()
+		{
+			console.log("Session closed");
+		};
+		
 
+		/*var sessionIndirect = manager.openSession(null, "C");
+		sessionIndirect.onReady = function()
+		{
+			
+		};*/
 	</script>
 </body>
 </html>

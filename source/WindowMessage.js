@@ -7,7 +7,7 @@
  *
  * @class WindowMessage
  */
-function WindowMessage(number, action, originType, originUUID, destinationType, destinationUUID, token, data)
+function WindowMessage(number, action, originType, originUUID, destinationType, destinationUUID, data, authentication)
 {
 	/**
 	 * Message number in the context of messages exchanged between the windows.
@@ -23,7 +23,7 @@ function WindowMessage(number, action, originType, originUUID, destinationType, 
 	 * Obligatory message field.
 	 *
 	 * @attribute action
-	 * @type {String}
+	 * @type {Number}
 	 */
 	this.action = action;
 	
@@ -76,19 +76,6 @@ function WindowMessage(number, action, originType, originUUID, destinationType, 
 	}
 
 	/**
-	 * Token of the user for authentication.
-	 *
-	 * Optional message field.
-	 *
-	 * @attribute token
-	 * @type {String}
-	 */
-	if(token !== undefined)
-	{
-		this.token = token;
-	}
-
-	/**
 	 * Payload of the message (the actual content of the message).
 	 *
 	 * Beware that object refereces are not accessible across windows.
@@ -102,4 +89,53 @@ function WindowMessage(number, action, originType, originUUID, destinationType, 
 	{
 		this.data = data;
 	}
+
+	/**
+	 * Token of the user for authentication.
+	 *
+	 * Optional message field.
+	 *
+	 * @attribute authentication
+	 * @type {String}
+	 */
+	if(authentication !== undefined)
+	{
+		this.authentication = authentication;
+	}
 }
+
+/**
+ * Ready message exchanged before starting comunication.
+ *
+ * @static
+ * @attribute READY
+ * @type {Number}
+ */
+WindowMessage.READY = 0;
+
+/**
+ * Closed message is used to indicate that the comunication was terminated.
+ *
+ * @static
+ * @attribute CLOSED
+ * @type {Number}
+ */
+WindowMessage.CLOSED = 1;
+
+/**
+ * Message to search for a window type.
+ *
+ * @static
+ * @attribute LOOKUP
+ * @type {Number}
+ */
+WindowMessage.LOOKUP = 2;
+
+/**
+ * Regular message exchanged between the windows.
+ *
+ * @static
+ * @attribute MESSAGE
+ * @type {Number}
+ */
+WindowMessage.MESSAGE = 3;

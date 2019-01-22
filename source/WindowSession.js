@@ -148,41 +148,29 @@ WindowSession.READY = 102;
 WindowSession.CLOSED = 103;
 
 /**
- * Set the state of the window.
+ * Set the status of the window.
  *
- * Ensures the correct order of the state being set.
+ * Ensures the correct order of the status being set.
  *
- * @method setState
- * @param {Number} state
+ * @method setStatus
+ * @param {Number} status
  */
-WindowSession.prototype.setState = function(state)
+WindowSession.prototype.setStatus = function(status)
 {
-	if(state <= this.state)
+	if(status <= this.status)
 	{
-		console.log("TabTalk: Invalid state, cannot go from " + this.state + " to " + state + ".");
+		console.log("TabTalk: Invalid status, cannot go from " + this.status + " to " + status + ".");
 		return;
 	}
 
-	this.state = state;
+	this.status = status;
 
 	//Send all queued waiting message
 	if(this.status === WindowSession.READY)
 	{
 		for(var i = 0; i < this.queue; i++)
 		{
-			if(this.window !== null)
-			{
-				this.window.postMessage(this.queue[i], "*");
-			}
-			else if(this.gateway !== null)
-			{
-				this.gateway.postMessage(this.queue[i], "*");
-			}
-			else
-			{
-				console.warn("TabTalk: Session has no window attached.");
-				return;
-			}
+			this.send(this.queue[i]);
 		}
 
 		this.queue = [];
@@ -194,14 +182,40 @@ WindowSession.prototype.setState = function(state)
  *
  * If the window is unknonwn the opener window is used if available.
  * 
- * @method sendMessage
+ * @method send
  * @param {String} action Name of the action of this message.
  * @param {Object} data Data to be sent (Optional).
- * @param {String} token Authentication information (Optional).
+ * @param {String} authentication Authentication information (Optional).
  */
-WindowSession.prototype.sendMessage = function(action, data, token)
+WindowSession.prototype.send = function(message)
 {
-	var message = new WindowMessage(this.counter++, action, this.manager.type, this.manager.uuid, this.type, this.uuid, token, data);
+	if(this.window !== null)
+	{
+		this.window.postMessage(message, "*");
+	}
+	else if(this.gateway !== null)
+	{
+		this.gateway.postMessage(message, "*");
+	}
+	else
+	{
+		console.warn("TabTalk: Session has no window attached.");
+		return;
+	}
+
+	console.log("TabTalk: Send message.", message);
+};
+
+/**
+ * Send a message to another window, if the session is in WAITING status the message will be queued to be send later.
+ * 
+ * @method sendMessage
+ * @param {Object} data Data to be sent (Optional).
+ * @param {String} authentication Authentication information (Optional).
+ */
+WindowSession.prototype.sendMessage = function(data, authentication)
+{
+	var message = new WindowMessage(this.counter++, WindowMessage.MESSAGE, this.manager.type, this.manager.uuid, this.type, this.uuid, data, authentication);
 
 	if(this.status === WindowSession.WAITING)
 	{
@@ -210,23 +224,9 @@ WindowSession.prototype.sendMessage = function(action, data, token)
 	}
 	else
 	{
-		if(this.window !== null)
-		{
-			this.window.postMessage(message, "*");
-		}
-		else if(this.gateway !== null)
-		{
-			this.gateway.postMessage(message, "*");
-		}
-		else
-		{
-			console.warn("TabTalk: Session has no window attached.");
-			return;
-		}
-
-		console.log("TabTalk: Message sent.", message);
+		this.send(message);
 	}
-};
+}
 
 /**
  * Close this session, send a close message and is possible close the window.
@@ -235,7 +235,9 @@ WindowSession.prototype.sendMessage = function(action, data, token)
  */
 WindowSession.prototype.close = function()
 {
-	this.sendMessage("closed");
+	var message = new WindowMessage(this.counter++, WindowMessage.CLOSED, this.manager.type, this.manager.uuid, this.type, this.uuid);
+
+	this.sendMessage(message);
 	
 	if(this.window !== null)
 	{
@@ -250,22 +252,13 @@ WindowSession.prototype.close = function()
  */
 WindowSession.prototype.acknowledge = function(onReady)
 {
-	var message = new WindowMessage(this.counter++, "ready", this.manager.type, this.manager.uuid);
-
-	if(this.window !== null)
-	{
-		this.window.postMessage(message, "*");
-	}
-	else
-	{
-		console.warn("TabTalk: Session has no window attached.");
-	}
+	this.send(new WindowMessage(this.counter++, WindowMessage.READY, this.manager.type, this.manager.uuid));
 };
 
 /**
  * Wait for this window to be ready.
  *
- * When a window is ready it should send a message containing a action property set to "ready".
+ * When a window is ready it should send a message containing a action property set to WindowMessage.READY.
  *
  * @method waitReady
  * @param {Function} onReady Callback called when the winow is ready.
@@ -284,14 +277,15 @@ WindowSession.prototype.waitReady = function()
 
 		var data = event.data;
 
-		if(data.action === "ready")
+		if(data.action === WindowMessage.READY)
 		{
 			console.log("TabTalk: Received ready message.", data, event);
 
 			self.type = data.originType;
 			self.uuid = data.originUUID;
 			self.manager.sessions[self.uuid] = self;
-			self.setState(WindowSession.READY);
+			self.setStatus(WindowSession.READY);
+			self.acknowledge();
 
 			if(self.onReady !== null)
 			{
@@ -299,14 +293,11 @@ WindowSession.prototype.waitReady = function()
 			}
 
 			manager.destroy();
-
-			self.acknowledge();
 		}
 		else
 		{
 			console.warn("TabTalk: Not a ready message, waiting for ready.", data, event);
 		}
-
 	});
 	manager.create();
 };

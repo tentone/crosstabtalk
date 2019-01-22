@@ -11,16 +11,10 @@
 	<script type="text/javascript" src="source/WindowSession.js"></script>
 	<script type="text/javascript">
 		var text = document.createElement("div");
-		text.innerHTML = "Window B";
+		text.innerHTML = "Window C";
 		document.body.append(text);
 
-		var manager = new WindowManager("B");
-
-		var session = manager.openSession("yetanother.html", "C");
-		session.onReady = function()
-		{
-			session.sendMessage("Mensagem de teste 123");
-		};
+		var manager = new WindowManager("C");
 	</script>
 </body>
 </html>
