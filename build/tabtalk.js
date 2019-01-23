@@ -512,7 +512,6 @@
 	{
 		if(status <= this.status)
 		{
-			console.warn("TabTalk: Invalid status cannot go from " + this.status + " to " + status + ".");
 			return;
 		}
 
@@ -545,16 +544,13 @@
 		if(this.window !== null)
 		{
 			this.window.postMessage(message, this.allowdomain);
-			console.log("TabTalk: Sent message.", message);
 		}
 		else if(this.gateway !== null)
 		{
-			console.log("TabTalk: Message passed to gateway.", message);
 			this.gateway.send(message);
 		}
 		else
 		{
-			console.warn("TabTalk: Session has no window attached.");
 			return;
 		}
 	};
@@ -573,7 +569,6 @@
 		if(this.status === WindowSession.WAITING)
 		{
 			this.queue.push(message);
-			console.log("TabTalk: Still on waiting status message was queued.", message);
 		}
 		else
 		{
@@ -642,15 +637,12 @@
 	{
 		var self = this;
 
-		console.log("TabTalk: Waiting for a ready message.");
-
 		var manager = new EventManager();
 		manager.add(window, "message", function(event)
 		{
 			//Ready events can only come from direct messages 
 			if(event.source !== self.window && self.window !== null)
 			{
-				console.log("TabTalk: Event from diferent window.", event);
 				return;
 			}
 
@@ -658,7 +650,6 @@
 
 			if(data.action === WindowMessage.READY)
 			{
-				console.log("TabTalk: Received ready message.", data, event);
 
 				self.type = data.originType;
 				self.uuid = data.originUUID;
@@ -672,10 +663,6 @@
 				}
 
 				manager.destroy();
-			}
-			else
-			{
-				console.warn("TabTalk: Not a ready message, waiting for ready.", data, event);
 			}
 		});
 		manager.create();
@@ -759,7 +746,6 @@
 			//Messages that need to be redirected
 			if(message.destinationUUID !== undefined && message.destinationUUID !== self.uuid)
 			{
-				console.warn("TabTalk: Destination UUID diferent from self, destination is " + message.destinationUUID);
 
 				var session = self.sessions[message.destinationUUID];
 
@@ -767,11 +753,6 @@
 				{
 					message.hops.push(self.uuid);
 					session.send(message);
-					console.log("TabTalk: Redirect message to destination.", session, message);
-				}
-				else
-				{
-					console.warn("TabTalk: Unknown destination, cannot redirect message.");
 				}
 
 				return;
@@ -793,15 +774,10 @@
 
 						delete self.sessions[message.originUUID];
 					}
-					else
-					{
-						console.warn("TabTalk: Unknown closed origin session.");
-					}
 				}
 				//Lookup
 				else if(message.action === WindowMessage.LOOKUP)
 				{
-					console.log("TabTalk: WindowManager lookup request received from " + message.originType + ".", message);
 
 					var found = false;
 					var response;
@@ -831,11 +807,6 @@
 					if(session !== undefined)
 					{
 						session.send(response);
-						console.log("TabTalk: Response to lookup request sent.", response);
-					}
-					else
-					{
-						console.warn("TabTalk: Unknown lookup origin session.");
 					}
 				}
 				//Connect message
@@ -852,17 +823,11 @@
 						session.gateway = gateway;
 						session.waitReady();
 						session.acknowledge();
-						console.warn("TabTalk: Connect message received, creating a new session.", message, session);
-					}
-					else
-					{
-						console.error("TabTalk: Connect message received, but the gateway is unknown.", message);
 					}
 				}
 				//Broadcast
 				else if(message.action === WindowMessage.BROADCAST)
 				{
-					console.log("TabTalk: WindowManager broadcast message received " + message.originType + ".", message);
 
 					if(self.onBroadcastMessage !== null)
 					{
@@ -889,7 +854,6 @@
 				//Messages
 				else if(message.action === WindowMessage.MESSAGE)
 				{
-					console.log("TabTalk: WindowManager message received " + message.originType + ".", message);
 
 					var session = self.sessions[message.originUUID];
 					if(session !== undefined)
@@ -899,14 +863,6 @@
 							session.onMessage(message.data, message.authentication);
 						}
 					}
-					else
-					{
-						console.warn("TabTalk: Unknown origin session.");
-					}
-				}
-				else
-				{
-					console.warn("TabTalk: Unknown message type.");
 				}
 			}
 		});
@@ -931,12 +887,9 @@
 	 */
 	WindowManager.prototype.logSessions = function()
 	{
-		console.log("TabTalk: List of known sessions:");
 		for(var i in this.sessions)
 		{
 			var session = this.sessions[i];
-
-			console.log("     " + session.uuid + " | " + session.type + " -> " + (session.gateway === null ? "*" : session.gateway.uuid));
 		}
 	};
 
@@ -999,7 +952,6 @@
 			var session = this.sessions[i];
 			if(session.type === type)
 			{
-				console.warn("TabTalk: A session of the type " + type + " already exists.");
 				return session;
 			}
 		}
@@ -1051,7 +1003,6 @@
 
 		for(var i in this.sessions)
 		{
-			console.log("TabTalk: Send lookup message to " + i + ".", message);
 			this.sessions[i].send(message);
 			sent++;
 		}
@@ -1075,13 +1026,10 @@
 							onFinish(session, data.data.uuid, data.data.type);
 						}
 					}
-					
-					console.log("TabTalk: Received lookup FOUND message from " + data.originUUID + ".", data.data);
 					received++;
 				}
 				else if(data.action === WindowMessage.LOOKUP_NOT_FOUND)
 				{
-					console.log("TabTalk: Received lookup NOT FOUND message from " + data.originUUID + ".");
 					received++;
 				}
 
@@ -1099,7 +1047,6 @@
 		}
 		else
 		{
-			console.log("TabTalk: No session available to run lookup.");
 			onFinish(null);
 		}
 	};

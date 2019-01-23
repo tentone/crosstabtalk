@@ -1,7 +1,15 @@
+import strip from "rollup-plugin-strip";
 
 export default {
 	input: "source/TabTalk.js",
-	plugins: [],
+	plugins: [
+		strip(
+		{
+			debugger: true,
+			functions: ["console.*", "assert.*", "debug", "alert"],
+			sourceMap: false
+		})
+	],
 	output: [
 		{
 			format: "umd",
