@@ -254,3 +254,5 @@ WindowMessage.LOOKUP_NOT_FOUND = 6;
  * @type {Number}
  */
 WindowMessage.CONNECT = 7;
+
+export {WindowMessage};

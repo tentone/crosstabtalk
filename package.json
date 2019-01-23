@@ -3,7 +3,7 @@
 	"version": "0.1.0",
 	"description": "Javascript browser tab/window local message communication library.",
 	"scripts": {
-		"build": "rollup -c",
+		"build": "rollup -c"
 	},
 	"keywords": [
 		"tab",

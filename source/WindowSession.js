@@ -350,3 +350,5 @@ WindowSession.prototype.waitReady = function()
 	});
 	manager.create();
 };
+
+export {WindowSession};
