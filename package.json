@@ -2,6 +2,11 @@
 	"name": "tabtalk",
 	"version": "0.1.0",
 	"description": "Javascript browser tab/window local message communication library.",
+	"main": "build/tabtalk.min.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/tentone/tabtalk.git"
+	},
 	"scripts": {
 		"build": "rollup -c && npm run uglify",
 		"docs": "jsdoc -d docs source",
