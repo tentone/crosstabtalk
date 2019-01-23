@@ -1,7 +1,7 @@
 import strip from "rollup-plugin-strip";
 
 export default {
-	input: "source/TabTalk.js",
+	input: "source/CrossTabTalk.js",
 	plugins: [
 		strip(
 		{
@@ -14,12 +14,12 @@ export default {
 		{
 			format: "umd",
 			name: "TabTalk",
-			file: "build/tabtalk.js",
+			file: "build/crosstabtalk.js",
 			indent: "\t"
 		},
 		{
 			format: "es",
-			file: "build/tabtalk.module.js",
+			file: "build/crosstabtalk.module.js",
 			indent: "\t"
 		}
 	]

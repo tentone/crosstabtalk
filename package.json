@@ -1,16 +1,16 @@
 {
-	"name": "tabtalk",
+	"name": "crosstabtalk",
 	"version": "0.1.0",
 	"description": "Javascript browser tab/window local message communication library.",
-	"main": "build/tabtalk.min.js",
+	"main": "build/crosstabtalk.min.js",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/tentone/tabtalk.git"
+		"url": "https://github.com/tentone/crosstabtalk.git"
 	},
 	"scripts": {
 		"build": "rollup -c && npm run uglify",
 		"docs": "jsdoc -d docs source",
-		"uglify": "uglifyjs --compress --mangle --output build/tabtalk.min.js -- build/tabtalk.js"
+		"uglify": "uglifyjs --compress --mangle --output build/crosstabtalk.min.js -- build/crosstabtalk.js"
 	},
 	"keywords": [
 		"tab",
