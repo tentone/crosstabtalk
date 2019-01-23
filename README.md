@@ -1,6 +1,30 @@
 # Tabtalk
  - Javascript browser tab/window local message communication library.
 
+## Usage
+
+```
+  var manager = new WindowManager("A");
+  manager.onBroadcastMessage = function(data, authentication)
+  {
+    console.log("Broadcast Message received", data, authentication);
+  };
+
+  var session = manager.openSession("another.html", "B");
+  session.onReady = function()
+  {
+    console.log("Session B is ready.");
+  };
+  session.onMessage = function(data, authentication)
+  {
+    console.log("Session B message received", data, authentication);
+  };
+  session.onClose = function()
+  {
+    console.log("Session B closed");
+  };
+```
+
 ## Comunication
 
 ```

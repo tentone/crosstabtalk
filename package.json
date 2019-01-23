@@ -1,0 +1,19 @@
+{
+	"name": "tabtalk",
+	"version": "0.1.0",
+	"description": "Javascript browser tab/window local message communication library.",
+	"scripts": {
+		"build": "rollup -c",
+	},
+	"keywords": [
+		"tab",
+		"window",
+		"message"
+	],
+	"author": "Tentone",
+	"license": "MIT",
+	"dependencies": {},
+	"devDependencies": {
+		"rollup": "^1.0.0"
+	}
+}

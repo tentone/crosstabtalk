@@ -22,13 +22,10 @@
 		
 		var session = manager.openSession("another.html", "B");
 		var sessionIndirect;
-
 		session.onReady = function()
 		{
 			console.log("Session B is ready.");
 			session.sendMessage("Test message from A to B");
-
-			
 		};
 		session.onMessage = function(data, authentication)
 		{

@@ -108,6 +108,8 @@ function WindowMessage(number, action, originType, originUUID, destinationType, 
 	 *
 	 * Each window where this message passes should push its UUID to this list.
 	 *
+	 * e.g [UUID1, UUID2, UUID3], UUID3 is the uuid of the last sessions before destination, booth origin and destination are not included in the hop list.
+	 * 
 	 * @attribute hops
 	 * @type {Array}
 	 */

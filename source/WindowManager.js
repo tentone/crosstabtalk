@@ -1,5 +1,9 @@
 "use strict";
 
+import {EventManager} from "./EventManager.js";
+import {WindowSession} from "./WindowSession.js";
+import {WindowMessage} from "./WindowMessage.js";
+
 /**
  * Message utils takes care of messaging between multiple windows. Messages can be transfered direcly or forwarded between windows.
  *
@@ -316,6 +320,17 @@ WindowManager.prototype.checkOpener = function()
  */
 WindowManager.prototype.openSession = function(url, type)
 {
+	//Search in the current sessions
+	for(var i in this.sessions)
+	{
+		var session = this.sessions[i];
+		if(session.type === type)
+		{
+			console.warn("TabTalk: A session of the type " + type + " already exists.");
+			return session;
+		}
+	}
+
 	var session = new WindowSession(this);
 	session.type = type;
 
@@ -476,3 +491,5 @@ WindowManager.generateUUID = function()
 		return uuid.toUpperCase();
 	};
 }();
+
+export {WindowManager};

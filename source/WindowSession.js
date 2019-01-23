@@ -1,5 +1,8 @@
 "use strict";
 
+import {EventManager} from "./EventManager.js";
+import {WindowMessage} from "./WindowMessage.js";
+
 /**
  * Windows sesstion client is used to store the status of a inter window communication process.
  *
@@ -309,12 +312,11 @@ WindowSession.prototype.waitReady = function()
 {
 	var self = this;
 
+	console.log("TabTalk: Waiting for a ready message.");
 
 	var manager = new EventManager();
 	manager.add(window, "message", function(event)
 	{
-		//console.log("TabTalk: Wait ready message event fired.", event);
-
 		//Ready events can only come from direct messages 
 		if(event.source !== self.window && self.window !== null)
 		{
