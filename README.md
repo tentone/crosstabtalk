@@ -1,16 +1,16 @@
 # Cross-Tabtalk
  - Javascript browser tab/window local message communication library.
  - Crossdomain networked comunication between 2 or more windows.
- - 
 
 ## Todo
-- Navigation requests.
-- Remote method invocation (RMI).
+ - Navigation requests.
+ - Cross window method invocation (RMI).
+ - Establish comunication with already existing windows.
 
 ## Build
  - Install NPM
  - Clone the repository to your computer
- - Run ```npm intall && npm run build```
+ - Run ```npm install && npm run build```
 
 ## Usage
  - The WindowManager is the object reponsible for handling the comunication.
@@ -54,9 +54,13 @@ manager.onBroadcastMessage = function(data, authentication)
   console.log("Broadcast Message received", data, authentication);
 };
 ```
+ - To close a session you can use the session.close() method.
+ - The close method can receive a closeWindow parameter to indicate if the session window should be closed.
 
 ## Comunication Diagram
- - TODO
+ - Bellow there is a simple comnunication diagram explaining the handshake process used to establish comunication.
+ - In this example three windows exist the fist window is A, A is opens B.
+ - B opens the window C, comunication from A to C has to be redirected by B.
 
 ```
            A              Open                 B
@@ -92,28 +96,31 @@ A Knows B  |         action:READY,             |
            |     }                             | 
            |                                   |
            |          Lookup Window            |
-           | --------------------------------> |
-           |     {                             |
-           |         action:LOOKUP,            | Lets assume 
-           |         originUUID:...,           | B known C
-           |         originType:...,           | its sends a response
-           |         destinationType:...,      | containing C data.
-           |         url:...                   |
-           |     }                             |
-           |                                   |
-           |          Lookup Response          |
-           | <-------------------------------- |
-           |     {                             |
-A Known C  |         action:LOOKUP_FOUND   ,   | If B doesnot known C
- via B     |         originUUID:...,           | action is lookup_unknown
-           |         originType:...,           | and data empty.
-           |         destinationType:...,      |
-           |         destinationUUID:...,      |
-           |         data:                     |
-           |         {                         |
-           |             uuid:...,             | UUID of C
-           |             type:...              | Type of C
-           |         }                         |
-           |     }                             |
-           
+           | --------------------------------> |                                   C
+           |     {                             |                                   |
+           |         action:LOOKUP,            | Lets assume                       |
+           |         originUUID:...,           | B known C                         |
+           |         originType:...,           | its sends a response              |
+           |         destinationType:...,      | containing C data.                |
+           |         url:...                   |                                   |
+           |     }                             |                                   |
+           |                                   |                                   |
+           |          Lookup Response          |                                   |
+           | <-------------------------------- |                                   |
+           |     {                             |                                   |
+A Known C  |         action:LOOKUP_FOUND   ,   | If B doesnot known C              |
+ via B     |         originUUID:...,           | action is lookup_unknown          |
+           |         originType:...,           | and data empty.                   |
+           |         destinationType:...,      |                                   |
+           |         destinationUUID:...,      |                                   |
+           |         data:                     |                                   |
+           |         {                         |                                   |
+           |             uuid:...,             | UUID of C                         |
+           |             type:...              | Type of C                         |
+           |         }                         |                                   |
+           |     }                             |                                   |
+           |        Ready Message from A       |         Ready Message from A      |
+           | --------------------------------> | --------------------------------> | 
+           |                                   |                                   |
+           |                                   |                                   |
 ```
