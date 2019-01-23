@@ -4,7 +4,7 @@
 	"description": "Javascript browser tab/window local message communication library.",
 	"scripts": {
 		"build": "rollup -c && npm run uglify",
-		"docs": "jsdoc build/tabtalk.js",
+		"docs": "jsdoc -d docs source",
 		"uglify": "uglifyjs --compress --mangle --output build/tabtalk.min.js -- build/tabtalk.js"
 	},
 	"keywords": [

@@ -9,7 +9,7 @@
 	 *
 	 * It is used by objects to make it easier to add and remove events from global DOM objects.
 	 *
-	 * @class EventManager
+	 * @class
 	 */
 	function EventManager()
 	{
@@ -18,7 +18,6 @@
 		 * 
 		 * Format [target, event, callback, active]
 		 * 
-		 * @attribute events
 		 * @type {Array}
 		 */
 		this.events = [];
@@ -27,7 +26,6 @@
 	/**
 	 * Add new event to the manager.
 	 *
-	 * @method add
 	 * @param {DOM} target Event target element.
 	 * @param {String} event Event name.
 	 * @param {Function} callback Callback function.
@@ -39,8 +37,6 @@
 
 	/**
 	 * Destroys this manager and remove all events.
-	 *
-	 * @method clear
 	 */
 	EventManager.prototype.clear = function()
 	{
@@ -50,8 +46,6 @@
 
 	/**
 	 * Creates all events in this manager.
-	 * 
-	 * @method create
 	 */
 	EventManager.prototype.create = function()
 	{
@@ -65,8 +59,6 @@
 
 	/**
 	 * Removes all events in this manager.
-	 * 
-	 * @method destroy
 	 */
 	EventManager.prototype.destroy = function()
 	{
@@ -83,14 +75,13 @@
 	 *
 	 * Contains booth window identification useful for message forwarding between windows and user authentication data.
 	 *
-	 * @class WindowMessage
+	 * @class
 	 */
 	function WindowMessage(number, action, originType, originUUID, destinationType, destinationUUID, data, authentication)
 	{
 		/**
 		 * Message number in the context of messages exchanged between the windows.
 		 *
-		 * @attribute number
 		 * @type {Number}
 		 */
 		this.number = number;
@@ -100,19 +91,17 @@
 		 *
 		 * Obligatory message field.
 		 *
-		 * @attribute action
 		 * @type {Number}
 		 */
 		this.action = action;
-		
-		/**
+
+		 /**
 		 * Type of the window that sent the message.
 		 *
 		 * Obligatory message field.
 		 *
 		 * (e.g. "3D", "Main", etc)
 		 *
-		 * @attribute type
 		 * @type {String}
 		 */
 		this.originType = originType;
@@ -122,7 +111,6 @@
 		 *
 		 * Obligatory message field.
 		 *
-		 * @attribute origin
 		 * @type {String}
 		 */
 		this.originUUID = originUUID;
@@ -132,7 +120,6 @@
 		 *
 		 * Optional message field.
 		 *
-		 * @attribute destinationType
 		 * @type {String}
 		 */
 		if(destinationType !== undefined)
@@ -145,7 +132,6 @@
 		 *
 		 * Optional message field.
 		 *
-		 * @attribute destination
 		 * @type {String}
 		 */
 		if(destinationUUID !== undefined)
@@ -160,7 +146,6 @@
 		 *
 		 * Optional message field.
 		 *
-		 * @attribute data
 		 * @type {Object}
 		 */
 		if(data !== undefined)
@@ -173,7 +158,6 @@
 		 *
 		 * Optional message field.
 		 *
-		 * @attribute authentication
 		 * @type {String}
 		 */
 		if(authentication !== undefined)
@@ -188,7 +172,6 @@
 		 *
 		 * e.g [UUID1, UUID2, UUID3], UUID3 is the uuid of the last sessions before destination, booth origin and destination are not included in the hop list.
 		 * 
-		 * @attribute hops
 		 * @type {Array}
 		 */
 		this.hops = [];
@@ -204,8 +187,7 @@
 	 * }
 	 *
 	 * @static
-	 * @attribute READY
-	 * @type {Number}
+	 * @attribute {Number}
 	 */
 	WindowMessage.READY = 0;
 
@@ -219,8 +201,7 @@
 	 * }
 	 *
 	 * @static
-	 * @attribute CLOSED
-	 * @type {Number}
+	 * @attribute {Number}
 	 */
 	WindowMessage.CLOSED = 1;
 
@@ -235,8 +216,7 @@
 	 * }
 	 *
 	 * @static
-	 * @attribute LOOKUP
-	 * @type {Number}
+	 * @attribute {Number}
 	 */
 	WindowMessage.LOOKUP = 2;
 
@@ -254,8 +234,7 @@
 	 * }
 	 *
 	 * @static
-	 * @attribute MESSAGE
-	 * @type {Number}
+	 * @attribute {Number}
 	 */
 	WindowMessage.MESSAGE = 3;
 
@@ -273,8 +252,7 @@
 	 * }
 	 *
 	 * @static
-	 * @attribute BROADCAST
-	 * @type {Number}
+	 * @attribute {Number}
 	 */
 	WindowMessage.BROADCAST = 4;
 
@@ -293,8 +271,7 @@
 	 * }
 	 *
 	 * @static
-	 * @attribute LOOKUP_FOUND
-	 * @type {Number}
+	 * @attribute {Number}
 	 */
 	WindowMessage.LOOKUP_FOUND = 5;
 
@@ -308,8 +285,7 @@
 	 * }
 	 *
 	 * @static
-	 * @attribute LOOKUP_NOT_FOUND
-	 * @type {Number}
+	 * @attribute {Number}
 	 */
 	WindowMessage.LOOKUP_NOT_FOUND = 6;
 
@@ -328,8 +304,7 @@
 	 * }
 	 *
 	 * @static
-	 * @attribute CONNECT
-	 * @type {Number}
+	 * @attribute {Number}
 	 */
 	WindowMessage.CONNECT = 7;
 
@@ -338,14 +313,13 @@
 	 *
 	 * Stores information about the other window e.g. (identification, status etc).
 	 *
-	 * @class WindowSession
+	 * @class
 	 */
 	function WindowSession(manager)
 	{
 		/**
 		 * The manager attached to this session.
 		 *
-		 * @attribute manager
 		 * @type {WindowManager}
 		 */
 		this.manager = manager;
@@ -355,7 +329,6 @@
 		 *
 		 * The window object is used as a point of communcation. Depending of security configurations the access may be restricted.
 		 *
-		 * @attribute window
 		 * @type {Object}
 		 */
 		this.window = null;
@@ -365,7 +338,6 @@
 		 *
 		 * Only available for windows that were open direclty, for wich a URL is known.
 		 *
-		 * @attribute url
 		 * @type {String}
 		 */
 		this.url = "";
@@ -373,7 +345,6 @@
 		/**
 		 * UUID to identify the other window.
 		 *
-		 * @attribute uuid
 		 * @type {String}
 		 */
 		this.uuid = null;
@@ -383,7 +354,6 @@
 		 *
 		 * (e.g. "3D", "Main", etc)
 		 *
-		 * @attribute type
 		 * @type {String}
 		 */
 		this.type = null;
@@ -393,7 +363,6 @@
 		 *
 		 * Increased everytime a message is sent.
 		 *
-		 * @attribute counter
 		 * @type {Number}
 		 */
 		this.counter = 0;
@@ -403,7 +372,6 @@
 		 *
 		 * When directly connected to the other window has a null value.
 		 *
-		 * @attribute gateway
 		 * @type {WindowSession}
 		 */
 		this.gateway = null;
@@ -411,7 +379,6 @@
 		/**
 		 * Status of the communication.
 		 *
-		 * @attribute status
 		 * @type {String}
 		 */
 		this.status = WindowSession.WAITING;
@@ -421,7 +388,6 @@
 		 * 
 		 * When the status is set to WAITING the messages are held here until it gets to READY status.
 		 *
-		 * @attribute queue
 		 * @type {Array}
 		 */
 		this.queue = [];
@@ -429,7 +395,6 @@
 		/**
 		 * Domains allowed for this session messages.
 		 *
-		 * @attribute allowdomain
 		 * @type {String}
 		 */
 		this.allowdomain = "*";
@@ -439,7 +404,6 @@
 		 *
 		 * Called when a normal message is received from another window, onMessage(data, authentication).
 		 *
-		 * @attribute onMessage
 		 * @type {Function}
 		 */
 		this.onMessage = null;
@@ -449,7 +413,6 @@
 		 *
 		 * Called when a broadcast message arrives, onBroadcastMessage(data, authentication).
 		 *
-		 * @attribute onBroadcastMessage
 		 * @type {Function}
 		 */
 		this.onBroadcastMessage = null;
@@ -457,7 +420,6 @@
 		/**
 		 * On closed callback.
 		 *
-		 * @attribute onClosed
 		 * @type {Function}
 		 */
 		this.onClosed = null;
@@ -465,7 +427,6 @@
 		/**
 		 * On ready callback.
 		 *
-		 * @attribute onReady
 		 * @type {Function}
 		 */
 		this.onReady = null;
@@ -477,8 +438,7 @@
 	 * While the window is waiting all messages are stored in a queue waiting for a ready message.
 	 *
 	 * @static
-	 * @attribute WAITING
-	 * @type {Number}
+	 * @attribute {Number}
 	 */
 	WindowSession.WAITING = 101;
 
@@ -486,8 +446,7 @@
 	 * READY status means that the window is ready to receive data.
 	 *
 	 * @static
-	 * @attribute READY
-	 * @type {Number}
+	 * @attribute {Number}
 	 */
 	WindowSession.READY = 102;
 
@@ -495,8 +454,7 @@
 	 * CLOSED status means that the window is not available.
 	 *
 	 * @static
-	 * @attribute CLOSED
-	 * @type {Number}
+	 * @attribute {Number}
 	 */
 	WindowSession.CLOSED = 103;
 
@@ -505,7 +463,6 @@
 	 *
 	 * Ensures the correct order of the status being set.
 	 *
-	 * @method setStatus
 	 * @param {Number} status
 	 */
 	WindowSession.prototype.setStatus = function(status)
@@ -534,7 +491,6 @@
 	 *
 	 * If the window is unknonwn the opener window is used if available.
 	 * 
-	 * @method send
 	 * @param {String} action Name of the action of this message.
 	 * @param {Object} data Data to be sent (Optional).
 	 * @param {String} authentication Authentication information (Optional).
@@ -558,7 +514,6 @@
 	/**
 	 * Send a message to another window, if the session is in WAITING status the message will be queued to be send later.
 	 * 
-	 * @method sendMessage
 	 * @param {Object} data Data to be sent (Optional).
 	 * @param {String} authentication Authentication information (Optional).
 	 */
@@ -579,7 +534,6 @@
 	/**
 	 * Close this session, send a close message and is possible close the window.
 	 * 
-	 * @method close
 	 * @param {Boolean} closeWindow If set true the session window will be closed (if possible).
 	 */
 	WindowSession.prototype.close = function(closeWindow)
@@ -598,8 +552,6 @@
 	 * Send a message to indicate that this session is READY.
 	 *
 	 * Also sends the session metadata for the remote window.
-	 *
-	 * @method acknowledge
 	 */
 	WindowSession.prototype.acknowledge = function()
 	{
@@ -617,8 +569,6 @@
 	 * Used to indicate the connection intent to remote windows after a positive lookup response.
 	 *
 	 * Works similarly to the ready message.
-	 *
-	 * @method connect
 	 */
 	WindowSession.prototype.connect = function()
 	{
@@ -630,7 +580,6 @@
 	 *
 	 * When a window is ready it should send a message containing a action property set to WindowMessage.READY.
 	 *
-	 * @method waitReady
 	 * @param {Function} onReady Callback called when the winow is ready.
 	 */
 	WindowSession.prototype.waitReady = function()
@@ -675,7 +624,7 @@
 	 *
 	 * When a window is open it cannot be acessed we need to wait for the ready message.
 	 * 
-	 * @class WindowManager
+	 * @class
 	 * @param {String} type Type of this window.
 	 */
 	function WindowManager(type)
@@ -685,7 +634,6 @@
 		/** 
 		 * Type of this window manager object.
 		 *
-		 * @attribute type
 		 * @type {String}
 		 */
 		this.type = type;
@@ -695,7 +643,6 @@
 		 *
 		 * Used to identify this window on communication with another windows.
 		 *
-		 * @attribute uuid
 		 * @type {String}
 		 */
 		this.uuid = WindowManager.generateUUID();
@@ -705,7 +652,6 @@
 		 *
 		 * Indexed by the UUID of the session.
 		 *
-		 * @attribute sessions
 		 * @type {Object}
 		 */
 		this.sessions = {};
@@ -715,7 +661,6 @@
 		 *
 		 * These still havent reached the READY state.
 		 *
-		 * @attribute waitingSessions
 		 * @type {Array}
 		 */
 		this.waitingSessions = [];
@@ -725,15 +670,13 @@
 		 *
 		 * Called when a broadcast message arrives, onBroadcastMessage(data, authentication).
 		 *
-		 * @attribute onBroadcastMessage
-		 * @type {Function}
+		 * type {Function}
 		 */
 		this.onBroadcastMessage = null;
 
 		/**
 		 * Event manager containing the message handling events for this manager.
 		 *
-		 * @attribute manager
 		 * @type {EventManager}
 		 */
 		this.manager = new EventManager();
@@ -881,9 +824,7 @@
 	}
 
 	/**
-	 * Log to the console a list of all known sessions
-	 *
-	 * @method logSessions
+	 * Log to the console a list of all known sessions.
 	 */
 	WindowManager.prototype.logSessions = function()
 	{
@@ -898,7 +839,6 @@
 	 *
 	 * The message will be passed further on.
 	 *
-	 * @method broadcast
 	 * @param {WindowMessage} data Data to be broadcasted.
 	 * @param {String} authentication Authentication information.
 	 */
@@ -917,7 +857,6 @@
 	 *
 	 * Used to send a signal indicating the parent window that it is ready to receive data.
 	 *
-	 * @method checkOpener
 	 * @return {WindowSession} Session fo the opener window, null if the window was not opened.
 	 */
 	WindowManager.prototype.checkOpener = function()
@@ -939,7 +878,6 @@
 	 *
 	 * First needs to search for a window of the same type in the known sessions.
 	 *
-	 * @method openSession
 	 * @param {String} url URL of the window.
 	 * @param {String} type Type of the window to open (Optional).
 	 * @return {WindowSession} Session createed to open a new window.
@@ -968,7 +906,7 @@
 				if(gateway === null)
 				{
 					if(url !== null)
-					{				
+					{	
 						session.url = url;
 						session.window = window.open(url);
 						session.waitReady();
@@ -992,7 +930,6 @@
 	/**
 	 * Lookup for a window type.
 	 *
-	 * @method lookup
 	 * @param {String} type Type of the window to look for.
 	 * @param {String} onFinish Receives the gateway session, found uuid and type as parameters onFinish(session, uuid, type), if null no window of the type was found.
 	 */
@@ -1054,7 +991,6 @@
 	/**
 	 * Check if this window was opened by another one.
 	 *
-	 * @method wasOpened
 	 * @return {Boolean} True if the window was opened by another window, false otherwise.
 	 */
 	WindowManager.prototype.wasOpened = function()
@@ -1066,8 +1002,6 @@
 	 * Dispose the window manager.
 	 *
 	 * Should be called when its not used anymore. Destroy all the window events created by the manager.
-	 *
-	 * @method dispose
 	 */
 	WindowManager.prototype.dispose = function()
 	{
@@ -1086,7 +1020,6 @@
 	 *
 	 * http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
 	 *
-	 * @method generateUUID
 	 * @return {String} UUID generated.
 	 */
 	WindowManager.generateUUID = function()

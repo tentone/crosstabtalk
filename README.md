@@ -1,8 +1,15 @@
 # Tabtalk
  - Javascript browser tab/window local message communication library.
+ - Crossdomain multi-window comunication.
 
-## Features
- - TODO
+## Todo
+- Navigation requests.
+- Remote method invocation (RMI).
+
+## Build
+ - Install NPM
+ - Clone the repository to your computer
+ - Run ```npm intall && npm run build```
 
 ## Usage
 

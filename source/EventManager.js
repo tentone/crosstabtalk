@@ -5,7 +5,7 @@
  *
  * It is used by objects to make it easier to add and remove events from global DOM objects.
  *
- * @class EventManager
+ * @class
  */
 function EventManager()
 {
@@ -14,7 +14,6 @@ function EventManager()
 	 * 
 	 * Format [target, event, callback, active]
 	 * 
-	 * @attribute events
 	 * @type {Array}
 	 */
 	this.events = [];
@@ -23,7 +22,6 @@ function EventManager()
 /**
  * Add new event to the manager.
  *
- * @method add
  * @param {DOM} target Event target element.
  * @param {String} event Event name.
  * @param {Function} callback Callback function.
@@ -35,8 +33,6 @@ EventManager.prototype.add = function(target, event, callback)
 
 /**
  * Destroys this manager and remove all events.
- *
- * @method clear
  */
 EventManager.prototype.clear = function()
 {
@@ -46,8 +42,6 @@ EventManager.prototype.clear = function()
 
 /**
  * Creates all events in this manager.
- * 
- * @method create
  */
 EventManager.prototype.create = function()
 {
@@ -61,8 +55,6 @@ EventManager.prototype.create = function()
 
 /**
  * Removes all events in this manager.
- * 
- * @method destroy
  */
 EventManager.prototype.destroy = function()
 {
