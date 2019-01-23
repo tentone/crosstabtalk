@@ -2,7 +2,6 @@
 export default {
 	input: "source/TabTalk.js",
 	plugins: [],
-	// sourceMap: true,
 	output: [
 		{
 			format: "umd",

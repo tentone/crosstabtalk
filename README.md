@@ -1,6 +1,9 @@
 # Tabtalk
  - Javascript browser tab/window local message communication library.
 
+## Features
+ - TODO
+
 ## Usage
 
 ```
@@ -25,7 +28,7 @@
   };
 ```
 
-## Comunication
+## Comunication Diagram
 
 ```
            A              Open                 B
