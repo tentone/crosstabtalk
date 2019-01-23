@@ -102,6 +102,16 @@ function WindowMessage(number, action, originType, originUUID, destinationType, 
 	{
 		this.authentication = authentication;
 	}
+
+	/**
+	 * Hops of this message until it reaches its destination.
+	 *
+	 * Each window where this message passes should push its UUID to this list.
+	 *
+	 * @attribute hops
+	 * @type {Array}
+	 */
+	this.hops = [];
 }
 
 /**
@@ -160,7 +170,7 @@ WindowMessage.LOOKUP = 2;
  *		destinationType: ...,
  *		destinationUUID: ...,
  *		data(?): ...,
- *		authentication(?): ...,
+ *		authentication(?): ...
  * }
  *
  * @static
@@ -177,8 +187,9 @@ WindowMessage.MESSAGE = 3;
  *		originUUID: ...,
  *		originType: ...,
  *		destinationUUID: "*",
+ *		hops: [UUID1, UUID2, ...], //Each hop adds its UUID to the list
  *		data(?): ...,
- *		authentication(?): ...,
+ *		authentication(?): ...
  * }
  *
  * @static
@@ -233,6 +244,7 @@ WindowMessage.LOOKUP_NOT_FOUND = 6;
  *		originType: ...,
  *		destinationType: ...,
  *		destinationUUID: ...,
+ *		hops: [UUID1, UUID2, ...] //Each hop adds its UUID to the list
  * }
  *
  * @static

@@ -71,141 +71,165 @@ function WindowManager(type)
 	this.manager = new EventManager();
 	this.manager.add(window, "message", function(event)
 	{
+		//console.log("TabTalk: Window message event fired.", event);
+
 		var message = event.data;
 
+		//Messages that need to be redirected
 		if(message.destinationUUID !== undefined && message.destinationUUID !== self.uuid)
 		{
-			console.warn("TabTalk: Destination UUID diferent from self.", message.destinationUUID);
+			console.warn("TabTalk: Destination UUID diferent from self, destination is " + message.destinationUUID);
 
 			var session = self.sessions[message.destinationUUID];
+
 			if(session !== undefined)
 			{
+				message.hops.push(self.uuid);
 				session.send(message);
-				console.log("TabTalk: Redirect message to destination.", message);
+				console.log("TabTalk: Redirect message to destination.", session, message);
 			}
 			else
 			{
 				console.warn("TabTalk: Unknown destination, cannot redirect message.");
 			}
+
+			return;
 		}
-
-		//Session closed
-		if(message.action === WindowMessage.CLOSED)
+		//Messages to be processed
+		else
 		{
-			var session = self.sessions[message.originUUID];
-
-			if(session !== undefined)
+			//Session closed
+			if(message.action === WindowMessage.CLOSED)
 			{
-				if(session.onClose != null)
+				var session = self.sessions[message.originUUID];
+
+				if(session !== undefined)
 				{
-					session.onClose();
-				}
-
-				delete self.sessions[message.originUUID];
-			}
-			else
-			{
-				console.warn("TabTalk: Unknown closed origin session.")
-			}
-		}
-		//Lookup
-		else if(message.action === WindowMessage.LOOKUP)
-		{
-			console.log("TabTalk: WindowManager lookup request received from " + message.originType + ".", message);
-
-			var found = false;
-			var response;
-
-			for(var i in self.sessions)
-			{
-				var session = self.sessions[i];
-
-				if(session.type === message.destinationType)
-				{
-					var response = new WindowMessage(0, WindowMessage.LOOKUP_FOUND, self.type, self.uuid, undefined, undefined,
+					if(session.onClose != null)
 					{
-						uuid:session.uuid,
-						type:session.type
-					});
-					found = true;
-					break;
+						session.onClose();
+					}
+
+					delete self.sessions[message.originUUID];
 				}
 				else
 				{
-					//TODO <BROADCAST LOOKUP MESSAGE>
+					console.warn("TabTalk: Unknown closed origin session.")
 				}
 			}
-
-			if(found === false)
+			//Lookup
+			else if(message.action === WindowMessage.LOOKUP)
 			{
-				response = new WindowMessage(0, WindowMessage.LOOKUP_NOT_FOUND, self.type, self.uuid);
-			}
+				console.log("TabTalk: WindowManager lookup request received from " + message.originType + ".", message);
 
-			var session = self.sessions[message.originUUID];
-			if(session !== undefined)
-			{
-				session.send(response);
-				console.log("TabTalk: Response to lookup request sent.", response);
-			}
-			else
-			{
-				console.warn("TabTalk: Unknown lookup origin session.");
-			}
-		}
-		//Connect message
-		else if(message.action === WindowMessage.CONNECT)
-		{
-			var session = new WindowSession(self);
-			session.uuid = message.originUUID;
-			session.type = message.originType;
-			session.acknowledge();
-			session.waitReady();
+				var found = false;
+				var response;
 
-			console.warn("TabTalk: Connect message received, creating a new session.", message, session);
-		}
-		//Broadcast
-		else if(message.action === WindowMessage.BROADCAST)
-		{
-			console.log("TabTalk: WindowManager broadcast message received " + message.originType + ".", message);
-
-			if(self.onBroadcastMessage !== null)
-			{
-				self.onBroadcastMessage(message.data, message.authentication);
-			}
-
-			//TODO <FIX BROADCAST LOOP>
-
-			for(var i in self.sessions)
-			{
-				var session = self.sessions[i];
-
-				if(session.uuid !== message.originUUID)
+				for(var i in self.sessions)
 				{
-					session.send(message);
+					var session = self.sessions[i];
 
-					if(session.onBroadcastMessage !== null)
+					if(session.type === message.destinationType)
 					{
-						session.onBroadcastMessage(message.data, message.authentication);
+						var response = new WindowMessage(0, WindowMessage.LOOKUP_FOUND, self.type, self.uuid, undefined, undefined,
+						{
+							uuid:session.uuid,
+							type:session.type
+						});
+						found = true;
+						break;
+					}
+					else
+					{
+						//TODO <BROADCAST LOOKUP MESSAGE>
+					}
+				}
+
+				if(found === false)
+				{
+					response = new WindowMessage(0, WindowMessage.LOOKUP_NOT_FOUND, self.type, self.uuid);
+				}
+
+				var session = self.sessions[message.originUUID];
+				if(session !== undefined)
+				{
+					session.send(response);
+					console.log("TabTalk: Response to lookup request sent.", response);
+				}
+				else
+				{
+					console.warn("TabTalk: Unknown lookup origin session.");
+				}
+			}
+			//Connect message
+			else if(message.action === WindowMessage.CONNECT)
+			{
+				var gatewayUUID = message.hops.pop();
+				var gateway = self.sessions[gatewayUUID];
+
+				if(gateway !== undefined)
+				{
+					var session = new WindowSession(self);
+					session.uuid = message.originUUID;
+					session.type = message.originType;
+					session.gateway = gateway;
+					session.waitReady();
+					session.acknowledge();
+					console.warn("TabTalk: Connect message received, creating a new session.", message, session);
+				}
+				else
+				{
+					console.error("TabTalk: Connect message received, but the gateway is unknown.", message);
+				}
+			}
+			//Broadcast
+			else if(message.action === WindowMessage.BROADCAST)
+			{
+				console.log("TabTalk: WindowManager broadcast message received " + message.originType + ".", message);
+
+				if(self.onBroadcastMessage !== null)
+				{
+					self.onBroadcastMessage(message.data, message.authentication);
+				}
+
+				//TODO <FIX BROADCAST LOOP>
+
+				for(var i in self.sessions)
+				{
+					var session = self.sessions[i];
+
+					if(session.uuid !== message.originUUID)
+					{
+						session.send(message);
+
+						if(session.onBroadcastMessage !== null)
+						{
+							session.onBroadcastMessage(message.data, message.authentication);
+						}
 					}
 				}
 			}
-		}
-		//Messages
-		else if(message.action === WindowMessage.MESSAGE)
-		{
-			console.log("TabTalk: WindowManager message received " + message.originType + ".", message);
-
-			var session = self.sessions[message.originUUID];
-			if(session !== undefined)
+			//Messages
+			else if(message.action === WindowMessage.MESSAGE)
 			{
-				if(session.onMessage !== null)
+				console.log("TabTalk: WindowManager message received " + message.originType + ".", message);
+
+				var session = self.sessions[message.originUUID];
+				if(session !== undefined)
 				{
-					session.onMessage(message.data, message.authentication);
+					if(session.onMessage !== null)
+					{
+						session.onMessage(message.data, message.authentication);
+					}
+				}
+				else
+				{
+					console.warn("TabTalk: Unknown origin session.");
 				}
 			}
 			else
 			{
-				console.warn("TabTalk: Unknown origin session.");
+				console.warn("TabTalk: Unknown message type.");
 			}
 		}
 	});
@@ -222,6 +246,22 @@ function WindowManager(type)
 
 	this.checkOpener();
 }
+
+/**
+ * Log to the console a list of all known sessions
+ *
+ * @method logSessions
+ */
+WindowManager.prototype.logSessions = function()
+{
+	console.log("TabTalk: List of known sessions:");
+	for(var i in this.sessions)
+	{
+		var session = this.sessions[i];
+
+		console.log("     " + session.uuid + " | " + session.type + " -> " + (session.gateway === null ? "*" : session.gateway.uuid));
+	}
+};
 
 /**
  * Broadcast a message to all available sessions.
@@ -282,7 +322,7 @@ WindowManager.prototype.openSession = function(url, type)
 	//Lookup the session
 	if(type !== undefined)
 	{
-		this.lookup(type, function(gateway)
+		this.lookup(type, function(gateway, uuid, type)
 		{
 			//Not found
 			if(gateway === null)
@@ -298,8 +338,10 @@ WindowManager.prototype.openSession = function(url, type)
 			else
 			{
 				session.gateway = gateway;
-				session.connect();
+				session.uuid = uuid;
+				session.type = type;
 				session.waitReady();
+				session.connect();
 			}
 		});
 	}
@@ -312,7 +354,7 @@ WindowManager.prototype.openSession = function(url, type)
  *
  * @method lookup
  * @param {String} type Type of the window to look for.
- * @param {String} onFinish Receives the gateway session as parameter, if null no window of the type was found.
+ * @param {String} onFinish Receives the gateway session, found uuid and type as parameters onFinish(session, uuid, type), if null no window of the type was found.
  */
 WindowManager.prototype.lookup = function(type, onFinish)
 {
@@ -335,17 +377,18 @@ WindowManager.prototype.lookup = function(type, onFinish)
 			var data = event.data;
 			if(data.action === WindowMessage.LOOKUP_FOUND)
 			{
+
 				if(found === false)
 				{
 					var session = self.sessions[data.originUUID];
 					if(session !== undefined)
 					{
 						found = true;
-						onFinish(session);
+						onFinish(session, data.data.uuid, data.data.type);
 					}
 				}
 				
-				console.log("TabTalk: Received lookup FOUND message from " + data.originUUID + ".");
+				console.log("TabTalk: Received lookup FOUND message from " + data.originUUID + ".", data.data);
 				received++;
 			}
 			else if(data.action === WindowMessage.LOOKUP_NOT_FOUND)

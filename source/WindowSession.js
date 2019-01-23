@@ -43,7 +43,7 @@ function WindowSession(manager)
 	 * @attribute uuid
 	 * @type {String}
 	 */
-	this.uuid = "";
+	this.uuid = null;
 	
 	/**
 	 * Textual type indicator of the other window, used to indetify the type of the other window.
@@ -53,7 +53,7 @@ function WindowSession(manager)
 	 * @attribute type
 	 * @type {String}
 	 */
-	this.type = "";
+	this.type = null;
 		
 	/**
 	 * Counter of messages exchanged between the sessions.
@@ -212,9 +212,11 @@ WindowSession.prototype.send = function(message)
 	if(this.window !== null)
 	{
 		this.window.postMessage(message, this.allowdomain);
+		console.log("TabTalk: Sent message.", message);
 	}
 	else if(this.gateway !== null)
 	{
+		console.log("TabTalk: Message passed to gateway.", message);
 		this.gateway.send(message);
 	}
 	else
@@ -222,8 +224,6 @@ WindowSession.prototype.send = function(message)
 		console.warn("TabTalk: Session has no window attached.");
 		return;
 	}
-
-	console.log("TabTalk: Send message.", message);
 };
 
 /**
@@ -275,7 +275,14 @@ WindowSession.prototype.close = function(closeWindow)
  */
 WindowSession.prototype.acknowledge = function()
 {
-	this.send(new WindowMessage(this.counter++, WindowMessage.READY, this.manager.type, this.manager.uuid));
+	if(this.uuid !== null)
+	{
+		this.send(new WindowMessage(this.counter++, WindowMessage.READY, this.manager.type, this.manager.uuid, this.type, this.uuid));
+	}
+	else
+	{
+		this.send(new WindowMessage(this.counter++, WindowMessage.READY, this.manager.type, this.manager.uuid));
+	}
 };
 
 /**
@@ -287,7 +294,7 @@ WindowSession.prototype.acknowledge = function()
  */
 WindowSession.prototype.connect = function()
 {
-	this.send(new WindowMessage(this.counter++, WindowMessage.CONNECT, this.manager.type, this.manager.uuid));
+	this.send(new WindowMessage(this.counter++, WindowMessage.CONNECT, this.manager.type, this.manager.uuid, this.type, this.uuid));
 };
 
 /**
@@ -302,11 +309,16 @@ WindowSession.prototype.waitReady = function()
 {
 	var self = this;
 
+
 	var manager = new EventManager();
 	manager.add(window, "message", function(event)
 	{
-		if(event.source !== self.window)
+		//console.log("TabTalk: Wait ready message event fired.", event);
+
+		//Ready events can only come from direct messages 
+		if(event.source !== self.window && self.window !== null)
 		{
+			console.log("TabTalk: Event from diferent window.", event);
 			return;
 		}
 
