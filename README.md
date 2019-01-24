@@ -1,4 +1,8 @@
 # Cross-Tabtalk
+
+[![npm version](https://badge.fury.io/js/crosstabtalk.svg)](https://badge.fury.io/js/crosstabtalk)
+[![GitHub version](https://badge.fury.io/gh/tentone%2Fcrosstabtalk.svg)](https://badge.fury.io/gh/tentone%2Fcrosstabtalk)
+
  - Javascript browser tab/window local message communication library.
  - Crossdomain networked comunication between 2 or more windows.
 
