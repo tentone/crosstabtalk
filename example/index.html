@@ -5,16 +5,13 @@
 	<meta charset="utf-8">
 </head>
 <body>
-	<script type="text/javascript" src="source/EventManager.js"></script>
-	<script type="text/javascript" src="source/WindowManager.js"></script>
-	<script type="text/javascript" src="source/WindowMessage.js"></script>
-	<script type="text/javascript" src="source/WindowSession.js"></script>
+	<script type="text/javascript" src="../build/crosstabtalk.js"></script>
 	<script type="text/javascript">
 		var text = document.createElement("div");
 		text.innerHTML = "Window A";
 		document.body.append(text);
 
-		var manager = new WindowManager("A");
+		var manager = new CTalk.WindowManager("A");
 		manager.onBroadcastMessage = function(data, authentication)
 		{
 			console.log("Broadcast Message received", data, authentication);

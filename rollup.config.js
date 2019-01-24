@@ -13,7 +13,7 @@ export default {
 	output: [
 		{
 			format: "umd",
-			name: "TabTalk",
+			name: "CTalk",
 			file: "build/crosstabtalk.js",
 			indent: "\t"
 		},

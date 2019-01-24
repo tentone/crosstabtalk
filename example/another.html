@@ -5,16 +5,13 @@
 	<meta charset="utf-8">
 </head>
 <body>
-	<script type="text/javascript" src="source/EventManager.js"></script>
-	<script type="text/javascript" src="source/WindowManager.js"></script>
-	<script type="text/javascript" src="source/WindowMessage.js"></script>
-	<script type="text/javascript" src="source/WindowSession.js"></script>
+	<script type="text/javascript" src="../build/crosstabtalk.js"></script>
 	<script type="text/javascript">
 		var text = document.createElement("div");
 		text.innerHTML = "Window B";
 		document.body.append(text);
 
-		var manager = new WindowManager("B");
+		var manager = new CTalk.WindowManager("B");
 		var session = manager.openSession("yetanother.html", "C");
 		session.onReady = function()
 		{

@@ -17,6 +17,11 @@
  - Run ```npm install && npm run build```
 
 ## Usage
+ - If youre using the UMD bundle the namespace for the project is ```CTalk```.
+
+```
+  var manager = new CTalk.WindowManager("A");
+```
  - The WindowManager is the object reponsible for handling the comunication.
  - Each window/tab should have one of these objects, to discern the windows a string type indicator.
  - To declare a window as type "A" we can create the WindowManager object.
