@@ -14,14 +14,19 @@
 		var manager = new CTalk.WindowManager("A");
 		manager.onBroadcastMessage = function(data, authentication)
 		{
-			console.log("Broadcast Message received", data, authentication);
+			console.log("Manager broadcast message received", data, authentication);
 		};
-		
+		manager.onMessage = function(type, data, authentication)
+		{
+			console.log("Manager message received", type, data, authentication);
+		};
+
 		var session = manager.openSession("another.html", "B");
 		var sessionIndirect;
 		session.onReady = function()
 		{
 			console.log("Session B is ready.");
+			
 			session.sendMessage("Test message from A to B");
 		};
 		session.onMessage = function(data, authentication)

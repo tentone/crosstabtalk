@@ -1,6 +1,6 @@
 {
 	"name": "crosstabtalk",
-	"version": "0.1.6",
+	"version": "0.1.7",
 	"description": "Javascript browser tab/window local message communication library.",
 	"main": "build/crosstabtalk.module.js",
 	"repository": {
@@ -11,7 +11,7 @@
 		"build": "rollup -c && npm run uglify",
 		"docs": "jsdoc -d docs source",
 		"uglify": "uglifyjs --compress --mangle --output build/crosstabtalk.min.js -- build/crosstabtalk.js",
-		"publish": "npm run build && npm run docs && npm publish --access public ."
+		"pub": "npm run build && npm run docs && npm publish --access public ."
 	},
 	"keywords": [
 		"tab",

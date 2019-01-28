@@ -684,7 +684,11 @@
 		this.onBroadcastMessage = null;
 
 		/**
-		 * On message callback, receives type, data and authentication as parameters.
+		 * Global manager on message callback, receives type, data and authentication as parameters.
+		 *
+		 * This onMessage callback is always called before the individual session callback.
+		 *
+		 * It might be used for globally handling authentication tasks.
 		 *
 		 * type {Function}
 		 */
@@ -793,13 +797,15 @@
 						self.onBroadcastMessage(message.data, message.authentication);
 					}
 
-					//TODO <FIX BROADCAST LOOP>
+					//Add manager uuid to the hop list
+					message.hops.push(self.uuid);
 
 					for(var i in self.sessions)
 					{
 						var session = self.sessions[i];
 
-						if(session.uuid !== message.originUUID)
+						//Forward message only to sessions that are not in the hop list
+						if(session.uuid !== message.originUUID && message.hops.indexOf(session.uuid) === -1)
 						{
 							session.send(message);
 

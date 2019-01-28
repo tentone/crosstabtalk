@@ -12,6 +12,11 @@
 		document.body.append(text);
 
 		var manager = new CTalk.WindowManager("B");
+		manager.onMessage = function(type, data, authentication)
+		{
+			console.log("Manager message received", type, data, authentication);
+		};
+
 		var session = manager.openSession("yetanother.html", "C");
 		session.onReady = function()
 		{
