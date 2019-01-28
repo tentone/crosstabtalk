@@ -870,11 +870,13 @@ WindowManager.prototype.checkOpener = function()
 /**
  * Create a new session with a new window from URL and type.
  *
- * First needs to search for a window of the same type in the known sessions.
+ * Before opening a new window it searches for a window of the same type in the known sessions.
+ *
+ * If a session of the same type already exists it is returned.
  *
  * @param {String} url URL of the window.
  * @param {String} type Type of the window to open (Optional).
- * @return {WindowSession} Session createed to open a new window.
+ * @return {WindowSession} Session created to open a new window.
  */
 WindowManager.prototype.openSession = function(url, type)
 {
@@ -920,6 +922,46 @@ WindowManager.prototype.openSession = function(url, type)
 
 	return session;
 };
+
+/**
+ * Get a session from the manager from its type.
+ *
+ * @param {String} type Type of the window to get.
+ * @return {WindowSession} Session of the type specified, null if none was found.
+ */
+WindowManager.prototype.getSession = function(type)
+{
+	for(var i in this.sessions)
+	{
+		var session = this.sessions[i];
+		if(session.type === type)
+		{
+			return session;
+		}
+	}
+
+	return null;
+};
+
+/**
+ * Check if a session of a type exists.
+ *
+ * @param {String} type Type of the window to check.
+ * @return {Boolean} True if a session of the type requested exists, false otherwise.
+ */
+WindowManager.prototype.sessionExists = function(type)
+{
+	for(var i in this.sessions)
+	{
+		if(this.sessions[i].type === type)
+		{
+			return true;
+		}
+	}
+
+	return false;
+};
+
 
 /**
  * Lookup for a window type.

@@ -49,6 +49,13 @@
   {
     console.log("Session B closed");
   };
+  
+  ...
+
+  if(manager.sessionExists("B"))
+  {
+    session = manager.getSession("B");
+  }
 ```
 
  - Messages can be broadcasted to all known windows using the WindowManager object.
