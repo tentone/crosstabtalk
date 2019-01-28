@@ -384,6 +384,15 @@
 		this.status = WindowSession.WAITING;
 
 		/**
+		 * List of all messages received.
+		 *
+		 * Stored the original WindowMessage object contains information about the window of origin and authentication data.
+		 * 
+		 * @type {Array}
+		 */
+		this.received = [];
+
+		/**
 		 * Messages waiting to be sent.
 		 * 
 		 * When the status is set to WAITING the messages are held here until it gets to READY status.
@@ -675,6 +684,13 @@
 		this.onBroadcastMessage = null;
 
 		/**
+		 * On message callback, receives type, data and authentication as parameters.
+		 *
+		 * type {Function}
+		 */
+		this.onMessage = null;
+
+		/**
 		 * Event manager containing the message handling events for this manager.
 		 *
 		 * @type {EventManager}
@@ -798,9 +814,16 @@
 				else if(message.action === WindowMessage.MESSAGE)
 				{
 
+					if(self.onMessage !== null)
+					{
+						self.onMessage(message.originType, message.data, message.authentication);
+					}
+
 					var session = self.sessions[message.originUUID];
 					if(session !== undefined)
 					{
+						session.received.push(message);
+						
 						if(session.onMessage !== null)
 						{
 							session.onMessage(message.data, message.authentication);

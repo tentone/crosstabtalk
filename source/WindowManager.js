@@ -62,6 +62,13 @@ function WindowManager(type)
 	this.onBroadcastMessage = null;
 
 	/**
+	 * On message callback, receives type, data and authentication as parameters.
+	 *
+	 * type {Function}
+	 */
+	this.onMessage = null;
+
+	/**
 	 * Event manager containing the message handling events for this manager.
 	 *
 	 * @type {EventManager}
@@ -212,9 +219,16 @@ function WindowManager(type)
 			{
 				console.log("TabTalk: WindowManager message received " + message.originType + ".", message);
 
+				if(self.onMessage !== null)
+				{
+					self.onMessage(message.originType, message.data, message.authentication);
+				}
+
 				var session = self.sessions[message.originUUID];
 				if(session !== undefined)
 				{
+					session.received.push(message);
+					
 					if(session.onMessage !== null)
 					{
 						session.onMessage(message.data, message.authentication);

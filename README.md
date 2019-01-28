@@ -72,6 +72,14 @@ manager.onBroadcastMessage = function(data, authentication)
 ```
  - To close a session you can use the session.close() method.
  - The close method can receive a closeWindow parameter to indicate if the session window should be closed.
+ - To handle message globally the manager object also contains an onMessage callback that receives the window type, data and authentication data as parameters.
+```
+manager.onMessage = function(type, data, auhentication)
+{
+  console.log("Message received", type, data, authentication);
+}
+```
+
 
 ## Comunication Diagram
  - Bellow there is a simple comnunication diagram explaining the handshake process used to establish comunication.

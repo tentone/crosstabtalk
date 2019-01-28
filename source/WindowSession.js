@@ -79,6 +79,15 @@ function WindowSession(manager)
 	this.status = WindowSession.WAITING;
 
 	/**
+	 * List of all messages received.
+	 *
+	 * Stored the original WindowMessage object contains information about the window of origin and authentication data.
+	 * 
+	 * @type {Array}
+	 */
+	this.received = [];
+
+	/**
 	 * Messages waiting to be sent.
 	 * 
 	 * When the status is set to WAITING the messages are held here until it gets to READY status.
