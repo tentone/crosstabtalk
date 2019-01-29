@@ -1,6 +1,6 @@
 {
 	"name": "crosstabtalk",
-	"version": "0.1.9",
+	"version": "0.1.10",
 	"description": "Javascript browser tab/window local message communication library.",
 	"main": "build/crosstabtalk.module.js",
 	"repository": {

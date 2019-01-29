@@ -270,13 +270,14 @@ function WindowManager(type, initialize)
  * By default it is automatically called on the constructor. But sometimes it might be usefull to initialize the window later on to avoid loosing messages.
  *
  * Be carefull to specify all the global callbacks before calling this method.
+ *
+ * @return {WindowSession} If this window was opened by another one it returns the respective session. Returns null otherwise.
  */
 WindowManager.prototype.initialize = function()
 {
 	this.manager.create();
-	this.checkOpener();
+	return this.checkOpener();
 };
-
 
 /**
  * Log to the console a list of all known sessions.
@@ -286,6 +287,7 @@ WindowManager.prototype.initialize = function()
 WindowManager.prototype.logSessions = function()
 {
 	console.log("TabTalk: List of known sessions:");
+
 	for(var i in this.sessions)
 	{
 		var session = this.sessions[i];
