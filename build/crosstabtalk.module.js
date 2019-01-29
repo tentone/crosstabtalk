@@ -654,8 +654,9 @@ WindowSession.prototype.waitReady = function()
  * 
  * @class
  * @param {String} type Type of this window.
+ * @param {Boolean} initialize Indicates if the manager should be automatically initialized, by default its true. If you want to manually initialize the manager later to avoid loosing message set to false.
  */
-function WindowManager(type)
+function WindowManager(type, initialize)
 {
 	var self = this;
 
@@ -867,10 +868,25 @@ function WindowManager(type)
 		}
 	});
 
-	this.manager.create();
-
-	this.checkOpener();
+	if(initialize !== false)
+	{
+		this.initialize();
+	}
 }
+
+/**
+ * Initialized the manager message handler, checks for the opener window and sends acknowledge message to waiting sessions.
+ *
+ * By default it is automatically called on the constructor. But sometimes it might be usefull to initialize the window later on to avoid loosing messages.
+ *
+ * Be carefull to specify all the global callbacks before calling this method.
+ */
+WindowManager.prototype.initialize = function()
+{
+	this.manager.create();
+	this.checkOpener();
+};
+
 
 /**
  * Log to the console a list of all known sessions.
