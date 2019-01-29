@@ -14,20 +14,25 @@
 		var manager = new CTalk.WindowManager("A");
 		manager.onBroadcastMessage = function(data, authentication)
 		{
+			var text = document.createElement("p");
+			text.style.color = "#FF0000";
+			text.innerHTML = "<b>Message Received</b>\nData: " + JSON.stringify(data) + "\nAuth: " + authentication;
+			document.body.append(text);
 			console.log("Manager broadcast message received", data, authentication);
 		};
 		manager.onMessage = function(type, data, authentication)
 		{
-			console.log("Manager message received", type, data, authentication);
+			var text = document.createElement("p");
+			text.innerHTML = "<b>Message Received</b>\nOrigin: " + type + "\nData: " + JSON.stringify(data) + "\nAuth: " + authentication;
+			document.body.append(text);
+			console.log("Message received", type, data, authentication);
 		};
 
-		var session = manager.openSession("another.html", "B");
-		var sessionIndirect;
+		var session = manager.openSession("b.html", "B");
+		session.sendMessage("Test message from A to B");
 		session.onReady = function()
 		{
 			console.log("Session B is ready.");
-			
-			session.sendMessage("Test message from A to B");
 		};
 		session.onMessage = function(data, authentication)
 		{
@@ -38,9 +43,10 @@
 			console.log("Session B closed");
 		};
 
+		var sessionIndirect;
 		function openC()
 		{
-			sessionIndirect = manager.openSession("yetanother.html", "C");
+			sessionIndirect = manager.openSession("c.html", "C");
 			sessionIndirect.onReady = function()
 			{
 				console.log("Session C is ready.");

@@ -421,14 +421,18 @@ function WindowSession(manager)
 	this.onBroadcastMessage = null;
 
 	/**
-	 * On closed callback.
+	 * On ready callback, called when the session enters the CLOSED state.
+	 *
+	 * This callback does not receive any parameter.
 	 *
 	 * @type {Function}
 	 */
 	this.onClosed = null;
 	
 	/**
-	 * On ready callback.
+	 * On ready callback, called when the session enters the READY state.
+	 *
+	 * This callback does not receive any parameter.
 	 *
 	 * @type {Function}
 	 */
@@ -448,13 +452,17 @@ WindowSession.WAITING = 101;
 /**
  * READY status means that the window is ready to receive data.
  *
+ * The message gets READY when it receives an ready message from the peer window.
+ *
+ * Messages sent before reaching READY state are queued and send only after the session reaches this state.
+ *
  * @static
  * @attribute {Number}
  */
 WindowSession.READY = 102;
 
 /**
- * CLOSED status means that the window is not available.
+ * CLOSED status means that the other window is not available.
  *
  * @static
  * @attribute {Number}
@@ -477,15 +485,32 @@ WindowSession.prototype.setStatus = function(status)
 
 	this.status = status;
 
-	//Send all queued waiting message
 	if(this.status === WindowSession.READY)
 	{
-		for(var i = 0; i < this.queue; i++)
+		if(this.queue.length > 0)
+		;
+
+		//Send all queued waiting message
+		for(var i = 0; i < this.queue.length; i++)
 		{
-			this.send(this.queue[i]);
+			var message = this.queue[i];
+			message.destinationUUID = this.uuid;
+			this.send(message);
 		}
 
 		this.queue = [];
+
+		if(this.onReady !== null)
+		{
+			this.onReady();
+		}
+	}
+	else if(this.status === WindowSession.CLOSED)
+	{
+		if(this.onClose != null)
+		{
+			this.onClose();
+		}
 	}
 };
 
@@ -500,6 +525,11 @@ WindowSession.prototype.setStatus = function(status)
  */
 WindowSession.prototype.send = function(message)
 {
+	if(this.status === WindowSession.CLOSED)
+	{
+		return;
+	}
+
 	if(this.window !== null)
 	{
 		this.window.postMessage(message, this.allowdomain);
@@ -543,7 +573,7 @@ WindowSession.prototype.close = function(closeWindow)
 {
 	var message = new WindowMessage(this.counter++, WindowMessage.CLOSED, this.manager.type, this.manager.uuid, this.type, this.uuid);
 
-	this.sendMessage(message);
+	this.send(message);
 	
 	if(closeWindow === true && this.window !== null)
 	{
@@ -606,13 +636,8 @@ WindowSession.prototype.waitReady = function()
 			self.type = data.originType;
 			self.uuid = data.originUUID;
 			self.manager.sessions[self.uuid] = self;
-			self.setStatus(WindowSession.READY);
 			self.acknowledge();
-
-			if(self.onReady !== null)
-			{
-				self.onReady(event);
-			}
+			self.setStatus(WindowSession.READY);
 
 			manager.destroy();
 		}
@@ -700,6 +725,11 @@ function WindowManager(type)
 
 		var message = event.data;
 
+		if(message.action === WindowMessage.READY)
+		{
+			return;
+		}
+
 		//Messages that need to be redirected
 		if(message.destinationUUID !== undefined && message.destinationUUID !== self.uuid)
 		{
@@ -724,11 +754,7 @@ function WindowManager(type)
 
 				if(session !== undefined)
 				{
-					if(session.onClose != null)
-					{
-						session.onClose();
-					}
-
+					session.setStatus(WindowSession.CLOSED);
 					delete self.sessions[message.originUUID];
 				}
 			}
@@ -848,6 +874,8 @@ function WindowManager(type)
 
 /**
  * Log to the console a list of all known sessions.
+ *
+ * Useful for debug purposes.
  */
 WindowManager.prototype.logSessions = function()
 {
@@ -860,7 +888,7 @@ WindowManager.prototype.logSessions = function()
 /**
  * Broadcast a message to all available sessions.
  *
- * The message will be passed further on.
+ * The message will be passed further on by the other windows that receive it.
  *
  * @param {WindowMessage} data Data to be broadcasted.
  * @param {String} authentication Authentication information.
@@ -868,6 +896,7 @@ WindowManager.prototype.logSessions = function()
 WindowManager.prototype.broadcast = function(data, authentication)
 {
 	var message = new WindowMessage(0, WindowMessage.BROADCAST, this.manager.type, this.manager.uuid, undefined, undefined, data, authentication);
+	message.hops.push(this.uuid);
 
 	for(var i in this.sessions)
 	{
@@ -973,6 +1002,25 @@ WindowManager.prototype.getSession = function(type)
 };
 
 /**
+ * Check if a session of a type exists and its available for message exchanging.
+ *
+ * @param {String} type Type of the window to check.
+ * @return {Boolean} True if a session of the type requested exists, false otherwise.
+ */
+WindowManager.prototype.sessionAvailable = function(type)
+{
+	for(var i in this.sessions)
+	{
+		if(this.sessions[i].type === type || message.action !== WindowMessage.CLOSED)
+		{
+			return true;
+		}
+	}
+
+	return false;
+};
+
+/**
  * Check if a session of a type exists.
  *
  * @param {String} type Type of the window to check.
@@ -990,7 +1038,6 @@ WindowManager.prototype.sessionExists = function(type)
 
 	return false;
 };
-
 
 /**
  * Lookup for a window type.

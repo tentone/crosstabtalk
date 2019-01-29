@@ -84,10 +84,15 @@ function WindowManager(type)
 
 		var message = event.data;
 
+		if(message.action === WindowMessage.READY)
+		{
+			return;
+		}
+
 		//Messages that need to be redirected
 		if(message.destinationUUID !== undefined && message.destinationUUID !== self.uuid)
 		{
-			console.warn("TabTalk: Destination UUID diferent from self, destination is " + message.destinationUUID);
+			console.warn("TabTalk: Destination UUID diferent from self, destination is " + message.destinationUUID, message);
 
 			var session = self.sessions[message.destinationUUID];
 
@@ -95,7 +100,7 @@ function WindowManager(type)
 			{
 				message.hops.push(self.uuid);
 				session.send(message);
-				console.log("TabTalk: Redirect message to destination.", session, message);
+				console.log("TabTalk: Redirected message to destination.", session, message);
 			}
 			else
 			{
@@ -114,11 +119,7 @@ function WindowManager(type)
 
 				if(session !== undefined)
 				{
-					if(session.onClose != null)
-					{
-						session.onClose();
-					}
-
+					session.setStatus(WindowSession.CLOSED);
 					delete self.sessions[message.originUUID];
 				}
 				else
@@ -238,12 +239,12 @@ function WindowManager(type)
 				}
 				else
 				{
-					console.warn("TabTalk: Unknown origin session.");
+					console.warn("TabTalk: Unknown origin session.", message);
 				}
 			}
 			else
 			{
-				console.warn("TabTalk: Unknown message type.");
+				console.warn("TabTalk: Unknown message type.", message);
 			}
 		}
 	});
@@ -263,6 +264,8 @@ function WindowManager(type)
 
 /**
  * Log to the console a list of all known sessions.
+ *
+ * Useful for debug purposes.
  */
 WindowManager.prototype.logSessions = function()
 {
@@ -278,7 +281,7 @@ WindowManager.prototype.logSessions = function()
 /**
  * Broadcast a message to all available sessions.
  *
- * The message will be passed further on.
+ * The message will be passed further on by the other windows that receive it.
  *
  * @param {WindowMessage} data Data to be broadcasted.
  * @param {String} authentication Authentication information.
@@ -286,6 +289,7 @@ WindowManager.prototype.logSessions = function()
 WindowManager.prototype.broadcast = function(data, authentication)
 {
 	var message = new WindowMessage(0, WindowMessage.BROADCAST, this.manager.type, this.manager.uuid, undefined, undefined, data, authentication);
+	message.hops.push(this.uuid);
 
 	for(var i in this.sessions)
 	{
@@ -392,6 +396,25 @@ WindowManager.prototype.getSession = function(type)
 };
 
 /**
+ * Check if a session of a type exists and its available for message exchanging.
+ *
+ * @param {String} type Type of the window to check.
+ * @return {Boolean} True if a session of the type requested exists, false otherwise.
+ */
+WindowManager.prototype.sessionAvailable = function(type)
+{
+	for(var i in this.sessions)
+	{
+		if(this.sessions[i].type === type || message.action !== WindowMessage.CLOSED)
+		{
+			return true;
+		}
+	}
+
+	return false;
+};
+
+/**
  * Check if a session of a type exists.
  *
  * @param {String} type Type of the window to check.
@@ -409,7 +432,6 @@ WindowManager.prototype.sessionExists = function(type)
 
 	return false;
 };
-
 
 /**
  * Lookup for a window type.

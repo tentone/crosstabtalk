@@ -122,14 +122,18 @@ function WindowSession(manager)
 	this.onBroadcastMessage = null;
 
 	/**
-	 * On closed callback.
+	 * On ready callback, called when the session enters the CLOSED state.
+	 *
+	 * This callback does not receive any parameter.
 	 *
 	 * @type {Function}
 	 */
 	this.onClosed = null;
 	
 	/**
-	 * On ready callback.
+	 * On ready callback, called when the session enters the READY state.
+	 *
+	 * This callback does not receive any parameter.
 	 *
 	 * @type {Function}
 	 */
@@ -149,13 +153,17 @@ WindowSession.WAITING = 101;
 /**
  * READY status means that the window is ready to receive data.
  *
+ * The message gets READY when it receives an ready message from the peer window.
+ *
+ * Messages sent before reaching READY state are queued and send only after the session reaches this state.
+ *
  * @static
  * @attribute {Number}
  */
 WindowSession.READY = 102;
 
 /**
- * CLOSED status means that the window is not available.
+ * CLOSED status means that the other window is not available.
  *
  * @static
  * @attribute {Number}
@@ -179,15 +187,34 @@ WindowSession.prototype.setStatus = function(status)
 
 	this.status = status;
 
-	//Send all queued waiting message
 	if(this.status === WindowSession.READY)
 	{
-		for(var i = 0; i < this.queue; i++)
+		if(this.queue.length > 0)
 		{
-			this.send(this.queue[i]);
+			console.warn("TabTalk: Sending queued messages.", this.queue);
+		}
+
+		//Send all queued waiting message
+		for(var i = 0; i < this.queue.length; i++)
+		{
+			var message = this.queue[i];
+			message.destinationUUID = this.uuid;
+			this.send(message);
 		}
 
 		this.queue = [];
+
+		if(this.onReady !== null)
+		{
+			this.onReady();
+		}
+	}
+	else if(this.status === WindowSession.CLOSED)
+	{
+		if(this.onClose != null)
+		{
+			this.onClose();
+		}
 	}
 };
 
@@ -202,6 +229,12 @@ WindowSession.prototype.setStatus = function(status)
  */
 WindowSession.prototype.send = function(message)
 {
+	if(this.status === WindowSession.CLOSED)
+	{
+		console.warn("TabTalk: Session in is closed state, its not possible to send data.", this, message);
+		return;
+	}
+
 	if(this.window !== null)
 	{
 		this.window.postMessage(message, this.allowdomain);
@@ -249,7 +282,7 @@ WindowSession.prototype.close = function(closeWindow)
 {
 	var message = new WindowMessage(this.counter++, WindowMessage.CLOSED, this.manager.type, this.manager.uuid, this.type, this.uuid);
 
-	this.sendMessage(message);
+	this.send(message);
 	
 	if(closeWindow === true && this.window !== null)
 	{
@@ -316,13 +349,8 @@ WindowSession.prototype.waitReady = function()
 			self.type = data.originType;
 			self.uuid = data.originUUID;
 			self.manager.sessions[self.uuid] = self;
-			self.setStatus(WindowSession.READY);
 			self.acknowledge();
-
-			if(self.onReady !== null)
-			{
-				self.onReady(event);
-			}
+			self.setStatus(WindowSession.READY);
 
 			manager.destroy();
 		}

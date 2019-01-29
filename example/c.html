@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<meta charset="utf-8">
+</head>
+<body>
+	<script type="text/javascript" src="../build/crosstabtalk.js"></script>
+	<script type="text/javascript">
+		var text = document.createElement("div");
+		text.innerHTML = "Window C";
+		document.body.append(text);
+
+		var manager = new CTalk.WindowManager("C");
+		manager.onMessage = function(type, data, authentication)
+		{
+			var text = document.createElement("p");
+			text.innerHTML = "<b>Message Received</b>\nOrigin: " + type + "\nData: " + JSON.stringify(data) + "\nAuth: " + authentication;
+			document.body.append(text);
+			console.log("Message received", type, data, authentication);
+		};
+		manager.onBroadcastMessage = function(data, authentication)
+		{
+			var text = document.createElement("p");
+			text.style.color = "#FF0000";
+			text.innerHTML = "<b>Message Received</b>\nData: " + JSON.stringify(data) + "\nAuth: " + authentication;
+			document.body.append(text);
+			console.log("Manager broadcast message received", data, authentication);
+		};
+	</script>
+</body>
+</html>
