@@ -147,7 +147,69 @@
 
 
 <div class="description">
-    CLOSED status means that the window is not available.
+    CLOSED status means that the other window is not available.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WindowSession.js.html">WindowSession.js</a>, <a href="WindowSession.js.html#line171">line 171</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id=".READY"><span class="type-signature">(static) </span>READY<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    READY status means that the window is ready to receive data.The message gets READY when it receives an ready message from the peer window.Messages sent before reaching READY state are queued and send only after the session reaches this state.
 </div>
 
 
@@ -186,68 +248,6 @@
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="WindowSession.js.html">WindowSession.js</a>, <a href="WindowSession.js.html#line163">line 163</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id=".READY"><span class="type-signature">(static) </span>READY<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    READY status means that the window is ready to receive data.
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WindowSession.js.html">WindowSession.js</a>, <a href="WindowSession.js.html#line155">line 155</a>
     </li></ul></dd>
     
 
@@ -309,7 +309,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WindowSession.js.html">WindowSession.js</a>, <a href="WindowSession.js.html#line147">line 147</a>
+        <a href="WindowSession.js.html">WindowSession.js</a>, <a href="WindowSession.js.html#line151">line 151</a>
     </li></ul></dd>
     
 
@@ -693,7 +693,7 @@
 
 
 <div class="description">
-    On closed callback.
+    On ready callback, called when the session enters the CLOSED state.This callback does not receive any parameter.
 </div>
 
 
@@ -741,7 +741,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WindowSession.js.html">WindowSession.js</a>, <a href="WindowSession.js.html#line129">line 129</a>
+        <a href="WindowSession.js.html">WindowSession.js</a>, <a href="WindowSession.js.html#line131">line 131</a>
     </li></ul></dd>
     
 
@@ -837,7 +837,7 @@
 
 
 <div class="description">
-    On ready callback.
+    On ready callback, called when the session enters the READY state.This callback does not receive any parameter.
 </div>
 
 
@@ -885,7 +885,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WindowSession.js.html">WindowSession.js</a>, <a href="WindowSession.js.html#line136">line 136</a>
+        <a href="WindowSession.js.html">WindowSession.js</a>, <a href="WindowSession.js.html#line140">line 140</a>
     </li></ul></dd>
     
 
@@ -1469,7 +1469,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WindowSession.js.html">WindowSession.js</a>, <a href="WindowSession.js.html#line265">line 265</a>
+        <a href="WindowSession.js.html">WindowSession.js</a>, <a href="WindowSession.js.html#line298">line 298</a>
     </li></ul></dd>
     
 
@@ -1604,7 +1604,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WindowSession.js.html">WindowSession.js</a>, <a href="WindowSession.js.html#line248">line 248</a>
+        <a href="WindowSession.js.html">WindowSession.js</a>, <a href="WindowSession.js.html#line281">line 281</a>
     </li></ul></dd>
     
 
@@ -1690,7 +1690,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WindowSession.js.html">WindowSession.js</a>, <a href="WindowSession.js.html#line282">line 282</a>
+        <a href="WindowSession.js.html">WindowSession.js</a>, <a href="WindowSession.js.html#line315">line 315</a>
     </li></ul></dd>
     
 
@@ -1871,7 +1871,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WindowSession.js.html">WindowSession.js</a>, <a href="WindowSession.js.html#line203">line 203</a>
+        <a href="WindowSession.js.html">WindowSession.js</a>, <a href="WindowSession.js.html#line230">line 230</a>
     </li></ul></dd>
     
 
@@ -2029,7 +2029,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WindowSession.js.html">WindowSession.js</a>, <a href="WindowSession.js.html#line228">line 228</a>
+        <a href="WindowSession.js.html">WindowSession.js</a>, <a href="WindowSession.js.html#line261">line 261</a>
     </li></ul></dd>
     
 
@@ -2164,7 +2164,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WindowSession.js.html">WindowSession.js</a>, <a href="WindowSession.js.html#line172">line 172</a>
+        <a href="WindowSession.js.html">WindowSession.js</a>, <a href="WindowSession.js.html#line180">line 180</a>
     </li></ul></dd>
     
 
@@ -2299,7 +2299,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WindowSession.js.html">WindowSession.js</a>, <a href="WindowSession.js.html#line294">line 294</a>
+        <a href="WindowSession.js.html">WindowSession.js</a>, <a href="WindowSession.js.html#line327">line 327</a>
     </li></ul></dd>
     
 
@@ -2349,7 +2349,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Jan 28 2019 15:45:18 GMT+0000 (GMT Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Jan 29 2019 10:14:59 GMT+0000 (GMT Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

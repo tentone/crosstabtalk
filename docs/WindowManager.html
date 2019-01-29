@@ -234,7 +234,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WindowManager.js.html">WindowManager.js</a>, <a href="WindowManager.js.html#line513">line 513</a>
+        <a href="WindowManager.js.html">WindowManager.js</a>, <a href="WindowManager.js.html#line535">line 535</a>
     </li></ul></dd>
     
 
@@ -754,7 +754,7 @@
 
 
 <div class="description">
-    Broadcast a message to all available sessions.The message will be passed further on.
+    Broadcast a message to all available sessions.The message will be passed further on by the other windows that receive it.
 </div>
 
 
@@ -870,7 +870,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WindowManager.js.html">WindowManager.js</a>, <a href="WindowManager.js.html#line286">line 286</a>
+        <a href="WindowManager.js.html">WindowManager.js</a>, <a href="WindowManager.js.html#line289">line 289</a>
     </li></ul></dd>
     
 
@@ -956,7 +956,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WindowManager.js.html">WindowManager.js</a>, <a href="WindowManager.js.html#line303">line 303</a>
+        <a href="WindowManager.js.html">WindowManager.js</a>, <a href="WindowManager.js.html#line307">line 307</a>
     </li></ul></dd>
     
 
@@ -1064,7 +1064,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WindowManager.js.html">WindowManager.js</a>, <a href="WindowManager.js.html#line494">line 494</a>
+        <a href="WindowManager.js.html">WindowManager.js</a>, <a href="WindowManager.js.html#line516">line 516</a>
     </li></ul></dd>
     
 
@@ -1199,7 +1199,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WindowManager.js.html">WindowManager.js</a>, <a href="WindowManager.js.html#line380">line 380</a>
+        <a href="WindowManager.js.html">WindowManager.js</a>, <a href="WindowManager.js.html#line384">line 384</a>
     </li></ul></dd>
     
 
@@ -1263,7 +1263,7 @@
 
 
 <div class="description">
-    Log to the console a list of all known sessions.
+    Log to the console a list of all known sessions.Useful for debug purposes.
 </div>
 
 
@@ -1307,7 +1307,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WindowManager.js.html">WindowManager.js</a>, <a href="WindowManager.js.html#line267">line 267</a>
+        <a href="WindowManager.js.html">WindowManager.js</a>, <a href="WindowManager.js.html#line270">line 270</a>
     </li></ul></dd>
     
 
@@ -1465,7 +1465,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WindowManager.js.html">WindowManager.js</a>, <a href="WindowManager.js.html#line420">line 420</a>
+        <a href="WindowManager.js.html">WindowManager.js</a>, <a href="WindowManager.js.html#line442">line 442</a>
     </li></ul></dd>
     
 
@@ -1623,7 +1623,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WindowManager.js.html">WindowManager.js</a>, <a href="WindowManager.js.html#line328">line 328</a>
+        <a href="WindowManager.js.html">WindowManager.js</a>, <a href="WindowManager.js.html#line332">line 332</a>
     </li></ul></dd>
     
 
@@ -1662,6 +1662,163 @@
     <dd>
         
 <span class="param-type"><a href="WindowSession.html">WindowSession</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="sessionAvailable"><span class="type-signature"></span>sessionAvailable<span class="signature">(type)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Check if a session of a type exists and its available for message exchanging.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>type</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Type of the window to check.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WindowManager.js.html">WindowManager.js</a>, <a href="WindowManager.js.html#line404">line 404</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    True if a session of the type requested exists, false otherwise.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Boolean</span>
 
 
     </dd>
@@ -1780,7 +1937,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WindowManager.js.html">WindowManager.js</a>, <a href="WindowManager.js.html#line400">line 400</a>
+        <a href="WindowManager.js.html">WindowManager.js</a>, <a href="WindowManager.js.html#line423">line 423</a>
     </li></ul></dd>
     
 
@@ -1888,7 +2045,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WindowManager.js.html">WindowManager.js</a>, <a href="WindowManager.js.html#line484">line 484</a>
+        <a href="WindowManager.js.html">WindowManager.js</a>, <a href="WindowManager.js.html#line506">line 506</a>
     </li></ul></dd>
     
 
@@ -1960,7 +2117,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Jan 28 2019 15:45:18 GMT+0000 (GMT Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Jan 29 2019 10:14:59 GMT+0000 (GMT Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>
